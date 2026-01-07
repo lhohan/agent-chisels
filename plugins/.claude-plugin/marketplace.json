@@ -1,0 +1,15 @@
+{
+  "name": "agent-chisels",
+  "owner": {
+    "name": "Hans L'Hoest",
+    "email": "agent-chisels@hanlho.simplelogin.com"
+  },
+  "plugins": [
+    {
+      "name": "agent-tools",
+      "source": "./agent-tools",
+      "description": "Core tools and skills for AI agents",
+      "version": "1.0.0"
+    }
+  ]
+}
