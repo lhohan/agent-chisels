@@ -1,5 +1,3 @@
 {
-  "name": "agent-tools",
-  "description": "Core tools and skills for AI agents",
-  "version": "1.0.0"
+  "name": "agent-tools"
 }

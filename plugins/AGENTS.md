@@ -29,6 +29,14 @@ plugins/
 - **Skill names**: kebab-case (e.g., `evaluating-skills`, `code-reviewer`)
 - **Skill files**: `SKILL.md` (uppercase, required)
 
+## Architecture
+
+To understand _why_ the plugins in this directory are setup: ./decision-log.md may provide context.
+
+When decisions are made they should be evaluated against the existing decisions in ./decision-log.md . 
+
+Decisions should be updated so the decision log and implementation stay consistent at all times.
+
 ## Plugin Version Policy
 
 **Policy**: All new Claude Code plugins start at version **1.0.0**.
@@ -79,6 +87,15 @@ Once pushed, the `plugins/marketplace.json` is published. Users can then:
 **Key Points**:
 - Plugin changes to the marketplace manifest (adding/removing plugins, version bumps) take effect when pushed.
 - Existing installations remain functional even if the marketplace URL becomes unavailable, but users cannot update or reinstall without the URL.
+
+## Plugin Metadata Strategy
+
+**Policy**: Use `marketplace.json` as the authoritative source for all plugin distribution metadata.
+
+- `marketplace.json`: Contains all distribution metadata (version, description, category, keywords)
+- `plugin.json`: Minimal file containing only the `name` field (required for local `--plugin-dir` development)
+
+For details on this decision, see [decision-log.md](./decision-log.md).
 
 ## Key Principles
 

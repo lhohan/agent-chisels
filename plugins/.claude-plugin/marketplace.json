@@ -9,7 +9,9 @@
       "name": "agent-tools",
       "source": "./agent-tools",
       "description": "Core tools and skills for AI agents",
-      "version": "1.0.0"
+      "version": "1.0.0",
+      "category": "agent-tools",
+      "keywords": ["skills", "evaluation", "quality-assurance"]
     }
   ]
 }
