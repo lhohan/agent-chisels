@@ -1,6 +1,6 @@
 ---
 name: skill-evaluator
-description: Evaluate Claude Code skills against best practices including size, structure, examples, and prompt engineering quality. Use when reviewing skill quality, optimizing existing skills, or ensuring compliance with official guidelines. Provides comprehensive analysis with actionable suggestions.
+description: Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
 ---
 
 # Claude Code Skill Evaluator
@@ -46,13 +46,20 @@ Once a skill is selected, read its `SKILL.md` file and extract:
 - Character count
 - Structure and sections
 
+#### Error Handling
+
+If SKILL.md is malformed, missing frontmatter, or unreadable:
+- Report the specific error to the user (e.g., "SKILL.md missing required frontmatter field: name")
+- Skip the full evaluation
+- Suggest corrective action if possible
+
 #### Review Example Report Format
 
-Before analyzing, consult **`examples/EXAMPLE.md`** - Sample evaluation report demonstrating proper structure and formatting. This ensures your evaluation report follows established patterns and demonstrates how to:
-- Present findings clearly
-- Format assessments with appropriate status indicators
-- Structure comparative analysis
-- Deliver actionable suggestions
+Before analyzing, consult the example evaluation reports:
+- **`examples/EXAMPLE.md`** - Demonstrates evaluation of a production-ready skill with passing scores
+- **`examples/EXAMPLE-WITH-WARNINGS.md`** - Demonstrates evaluation of a near-production skill with warnings and improvement suggestions
+
+These examples show proper report structure, formatting, status indicators (✓ Pass / ⚠ Warning / ❌ Fail), and how to deliver actionable feedback across the quality spectrum.
 
 ### 3. Analyze Against Best Practices
 
@@ -192,6 +199,11 @@ Create a detailed evaluation report with these components:
    - Professional verdict on production-readiness
    - Clear recommendation (Keep as-is / Minor tweaks / Significant refactor / Major restructure)
 
+8. **Report Metadata** (optional footer):
+   - Evaluation date (YYYY-MM-DD format)
+   - Skill path evaluated
+   - Evaluator skill version (if tracking multiple versions of skill-evaluator itself)
+
 ### 5. Deliver Report to User
 
 Present the complete evaluation report to the user in a clear, formatted structure. Ensure:
@@ -214,6 +226,15 @@ Present the complete evaluation report to the user in a clear, formatted structu
 - User has installed skills in `~/.claude/skills/`
 - Target skill has a valid `SKILL.md` file with frontmatter
 - User accepts the detailed, honest evaluation
+
+## Edge Cases & Limitations
+
+The skill evaluator has the following constraints:
+
+- **Missing frontmatter:** If SKILL.md lacks valid frontmatter (name, description), report error and cannot proceed with evaluation
+- **Oversized skills:** Skills over 500 lines are flagged as critical issues immediately during metrics analysis
+- **Missing examples directory:** Note as observation in Dimension 5 analysis; not a failure condition
+- **Non-standard paths:** Skill must be accessible at the provided path; symbolic links are supported if they resolve correctly
 
 ## Context & Standards
 
