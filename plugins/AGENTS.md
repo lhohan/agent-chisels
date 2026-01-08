@@ -1,6 +1,33 @@
-# Plugins Policy
+# Plugin Development Guide
 
-This document defines policies for developing, versioning, and publishing Claude Code plugins in the agent-chisels repository.
+This document defines policies, guidelines, and best practices for developing, versioning, and publishing Claude Code plugins in the agent-chisels repository.
+
+## Plugin Development Guidelines
+
+### Directory Structure
+
+All plugins go in `plugins/[plugin-name]/`:
+
+```
+plugins/
+├── marketplace.json           # Single source of truth for all published plugins
+└── [plugin-name]/
+    ├── .claude-plugin/
+    │   └── plugin.json        # Plugin metadata (name, version, description)
+    ├── skills/
+    │   └── [skill-name]/
+    │       ├── SKILL.md       # Skill definition
+    │       └── examples/      # Example files
+    ├── commands/
+    ├── agents/
+    └── hooks/
+```
+
+### Naming Conventions
+
+- **Plugin names**: kebab-case (e.g., `agent-tools`, `jujutsu-vcs`)
+- **Skill names**: kebab-case (e.g., `skill-evaluator`, `code-reviewer`)
+- **Skill files**: `SKILL.md` (uppercase, required)
 
 ## Plugin Version Policy
 
@@ -18,19 +45,30 @@ This document defines policies for developing, versioning, and publishing Claude
 - New feature in `agent-tools`: `1.1.0`
 - Breaking changes to `agent-tools`: `2.0.0`
 
-## Push-to-Publish Workflow
+## Plugin Publishing Workflow
 
 **Policy**: Publishing a plugin is accomplished by pushing to the remote repository (e.g., GitHub).
 
-**Workflow**:
-1. Develop plugins locally in `plugins/[plugin-name]/`, .e.g. by using `claude --plugin-dir $(pwd)/plugins/[plugin-name]`.
-2. Test skills, commands, and agents thoroughly.
-3. Update version in both:
+### Publishing Steps
+
+1. **Develop locally**:
+   ```bash
+   claude --plugin-dir ./plugins/[plugin-name]
+   ```
+
+2. **Test thoroughly**: 
+   - Use `skill-evaluator` for all skills
+   - Test commands and agents as applicable
+
+3. **Update versions** in both:
    - `plugins/[plugin-name]/.claude-plugin/plugin.json`
    - `plugins/marketplace.json`
-4. Commit changes:
-5. Tag the release with name `release-[plugin-name]-[<new-version>]`
-6. Push to remote:
+
+4. **Commit changes**:
+5. **Tag the release**:
+6. **Push to remote**:
+
+### Marketplace Distribution
 
 Once pushed, the `plugins/marketplace.json` is published. Users can then:
 - Add the marketplace: `/plugin marketplace add agent-chisels https://raw.githubusercontent.com/lhohan/agent-chisels/main/plugins/marketplace.json`
@@ -40,36 +78,11 @@ Once pushed, the `plugins/marketplace.json` is published. Users can then:
 - Plugin changes to the marketplace manifest (adding/removing plugins, version bumps) take effect when pushed.
 - Existing installations remain functional even if the marketplace URL becomes unavailable, but users cannot update or reinstall without the URL.
 
-## Plugin Development Guidelines
+## Key Principles
 
-### Directory Structure
-
-All plugins go in `plugins/[plugin-name]/`:
-
-```
-plugins/
-├── marketplace.json           # Single source of truth for all published plugins
-└── [plugin-name]/
-    ├── .claude-plugin/
-    │   └── plugin.json        # Plugin metadata (name, version, description)
-    ├── skills/
-    ├── commands/
-    ├── agents/
-    └── hooks/
-```
-
-### Naming Conventions
-
-- **Plugin names**: kebab-case (e.g., `agent-tools`, `jujutsu-vcs`)
-- **Skill names**: kebab-case (e.g., `skill-evaluator`, `code-reviewer`)
-- **Skill files**: `SKILL.md` (uppercase, required)
-
-## Skill development guide
-
-When new Skills are added or updated run the `skill-evaluator` skill on the changed skill.
-
-
----
-
-**Document Version**: 1.0.0  
-**Related**: `docs/plugin-dev-guide.md`, `plugins/marketplace.json`
+1. **Quality First**: Use `skill-evaluator` before publishing
+2. **Clear Scope**: Each skill has one focused capability
+3. **User-Centric**: Write for discoverability and ease of use
+4. **Semantic Versioning**: Follow version conventions
+5. **Documentation**: Comprehensive examples and guidelines
+6. **Consistency**: Follow naming and structure conventions
