@@ -60,9 +60,11 @@ plugins/
    - Use `evaluating-skills` for all skills
    - Test commands and agents as applicable
 
-3. **Update versions** in both:
-   - `plugins/[plugin-name]/.claude-plugin/plugin.json`
-   - `plugins/marketplace.json`
+3. **Update documentation**:
+   - Add new skills to `plugins/README.md` with name and concise description (1-3 sentences max)
+   - Update versions in both:
+     - `plugins/[plugin-name]/.claude-plugin/plugin.json`
+     - `plugins/marketplace.json`
 
 4. **Commit changes**:
 5. **Tag the release**:
