@@ -1,8 +1,8 @@
- # Skill Evaluation Report: skill-evaluator
+ # Skill Evaluation Report: evaluating-skills
 
 Executive Summary
 
-The skill-evaluator demonstrates solid professional quality and is near production-ready. At 226 lines, it sits at 45% of the 500-line maximum, making it an appropriately-sized, medium-high complexity skill. The skill exhibits excellent structure, comprehensive dimensional analysis framework, strong prompt engineering practices, and zero critical anti-patterns. However, several optimization opportunities exist around edge case handling, example diversity, and description conciseness that should be addressed before final deployment.
+The evaluating-skills demonstrates solid professional quality and is near production-ready. At 226 lines, it sits at 45% of the 500-line maximum, making it an appropriately-sized, medium-high complexity skill. The skill exhibits excellent structure, comprehensive dimensional analysis framework, strong prompt engineering practices, and zero critical anti-patterns. However, several optimization opportunities exist around edge case handling, example diversity, and description conciseness that should be addressed before final deployment.
 
 Key Strengths:
 - Comprehensive 8-dimensional evaluation framework with clear assessment criteria
@@ -95,15 +95,15 @@ Compared to official Anthropic skills repository patterns:
 ┌─────────────────┬──────────┬───────────────┬─────────────────────────────────────────────────────┐
 │      Skill      │  Lines   │  Complexity   │                     Comparison                      │
 ├─────────────────┼──────────┼───────────────┼─────────────────────────────────────────────────────┤
-│ internal-comms  │ ~40      │ Low           │ skill-evaluator is significantly more comprehensive │
+│ internal-comms  │ ~40      │ Low           │ evaluating-skills is significantly more comprehensive │
 ├─────────────────┼──────────┼───────────────┼─────────────────────────────────────────────────────┤
-│ canvas-design   │ ~310     │ Moderate-High │ skill-evaluator is leaner and more focused          │
+│ canvas-design   │ ~310     │ Moderate-High │ evaluating-skills is leaner and more focused          │
 ├─────────────────┼──────────┼───────────────┼─────────────────────────────────────────────────────┤
-│ skill-creator   │ ~550-600 │ High (meta)   │ skill-evaluator is more compact                     │
+│ skill-creator   │ ~550-600 │ High (meta)   │ evaluating-skills is more compact                     │
 ├─────────────────┼──────────┼───────────────┼─────────────────────────────────────────────────────┤
-│ skill-evaluator │ 226      │ Medium-High   │ Well-balanced for meta-skill ✓                      │
+│ evaluating-skills │ 226      │ Medium-High   │ Well-balanced for meta-skill ✓                      │
 └─────────────────┴──────────┴───────────────┴─────────────────────────────────────────────────────┘
-Assessment: The skill-evaluator sits in a good position between comprehensive coverage and readability. Unlike skill-creator (which needs to teach creation), this skill focuses purely on evaluation, making 226 lines appropriate. The structure mirrors professional code review practices with dimensional analysis similar to rubrics used in software engineering assessments.
+Assessment: The evaluating-skills sits in a good position between comprehensive coverage and readability. Unlike skill-creator (which needs to teach creation), this skill focuses purely on evaluation, making 226 lines appropriate. The structure mirrors professional code review practices with dimensional analysis similar to rubrics used in software engineering assessments.
 
 ---
 Actionable Suggestions
@@ -137,7 +137,7 @@ Low Priority
 ---
 Overall Assessment
 
-Verdict: The skill-evaluator is near production-ready and requires minor improvements before deployment.
+Verdict: The evaluating-skills is near production-ready and requires minor improvements before deployment.
 
 Recommendation: Minor tweaks - The skill demonstrates professional quality, solid methodology, and excellent structural organization. Addressing the description verbosity, adding error handling guidance, and expanding example diversity would move this from "near production-ready" to "production-ready."
 
@@ -147,6 +147,6 @@ Estimated effort to production-ready: 1-2 hours for description tightening, erro
 
 ---
 Evaluation Date: 2026-01-08
-Skill Version Evaluated: Current in /Users/hans/dev/agent-chisels/plugins/agent-tools/skills/skill-evaluator
+Skill Version Evaluated: Current in /Users/hans/dev/agent-chisels/plugins/agent-tools/skills/evaluating-skills
 Assessment Standard: Claude Code official guidelines (self-referential evaluation using skill's own methodology)
-Meta-Note: This evaluation applied the skill-evaluator's own 8-dimensional framework to itself, demonstrating the methodology's self-consistency and robustness.
+Meta-Note: This evaluation applied the evaluating-skills's own 8-dimensional framework to itself, demonstrating the methodology's self-consistency and robustness.

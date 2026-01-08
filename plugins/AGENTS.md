@@ -26,7 +26,7 @@ plugins/
 ### Naming Conventions
 
 - **Plugin names**: kebab-case (e.g., `agent-tools`, `jujutsu-vcs`)
-- **Skill names**: kebab-case (e.g., `skill-evaluator`, `code-reviewer`)
+- **Skill names**: kebab-case (e.g., `evaluating-skills`, `code-reviewer`)
 - **Skill files**: `SKILL.md` (uppercase, required)
 
 ## Plugin Version Policy
@@ -57,7 +57,7 @@ plugins/
    ```
 
 2. **Test thoroughly**: 
-   - Use `skill-evaluator` for all skills
+   - Use `evaluating-skills` for all skills
    - Test commands and agents as applicable
 
 3. **Update versions** in both:
@@ -80,7 +80,7 @@ Once pushed, the `plugins/marketplace.json` is published. Users can then:
 
 ## Key Principles
 
-1. **Quality First**: Use `skill-evaluator` before publishing
+1. **Quality First**: Use `evaluating-skills` before publishing
 2. **Clear Scope**: Each skill has one focused capability
 3. **User-Centric**: Write for discoverability and ease of use
 4. **Semantic Versioning**: Follow version conventions

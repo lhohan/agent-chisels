@@ -1,5 +1,5 @@
 ---
-name: skill-evaluator
+name: evaluating-skills
 description: Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
 ---
 
@@ -202,7 +202,7 @@ Create a detailed evaluation report with these components:
 8. **Report Metadata** (optional footer):
    - Evaluation date (YYYY-MM-DD format)
    - Skill path evaluated
-   - Evaluator skill version (if tracking multiple versions of skill-evaluator itself)
+   - Evaluator skill version (if tracking multiple versions of evaluating-skills itself)
 
 ### 5. Deliver Report to User
 

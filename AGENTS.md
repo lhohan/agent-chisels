@@ -40,6 +40,6 @@ agent-chisels/
 Refer to that document for:
 - Plugin and skill structure and naming conventions
 - Detailed skill development standards (frontmatter, organization, size, scope, examples)
-- Quality assurance with `skill-evaluator`
+- Quality assurance with `evaluating-skills`
 - Version management and publishing workflows
 - Marketplace distribution
