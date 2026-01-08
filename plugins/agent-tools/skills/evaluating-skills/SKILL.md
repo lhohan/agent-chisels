@@ -14,13 +14,15 @@ Systematically evaluate Claude Code skills for quality, compliance with best pra
   - [2. Read the Skill File](#2-read-the-skill-file)
   - [3. Analyze Against Best Practices](#3-analyze-against-best-practices)
     - [Dimension 1: Size & Length](#dimension-1-size--length)
-    - [Dimension 2: Scope Definition](#dimension-2-scope-definition)
-    - [Dimension 3: Description Quality](#dimension-3-description-quality)
-    - [Dimension 4: Structure & Organization](#dimension-4-structure--organization)
-    - [Dimension 5: Examples](#dimension-5-examples)
-    - [Dimension 6: Anti-Pattern Detection](#dimension-6-anti-pattern-detection)
-    - [Dimension 7: Prompt Engineering Quality](#dimension-7-prompt-engineering-quality)
-    - [Dimension 8: Completeness](#dimension-8-completeness)
+    - [Dimension 2: Token Economy](#dimension-2-token-economy)
+    - [Dimension 3: Degrees of Freedom](#dimension-3-degrees-of-freedom)
+    - [Dimension 4: Scope Definition](#dimension-4-scope-definition)
+    - [Dimension 5: Description Quality](#dimension-5-description-quality)
+    - [Dimension 6: Structure & Organization](#dimension-6-structure--organization)
+    - [Dimension 7: Examples](#dimension-7-examples)
+    - [Dimension 8: Anti-Pattern Detection](#dimension-8-anti-pattern-detection)
+    - [Dimension 9: Prompt Engineering Quality](#dimension-9-prompt-engineering-quality)
+    - [Dimension 10: Completeness](#dimension-10-completeness)
   - [4. Generate Comprehensive Evaluation Report](#4-generate-comprehensive-evaluation-report)
   - [5. Deliver Report to User](#5-deliver-report-to-user)
 - [Important Guidelines](#important-guidelines)
@@ -63,7 +65,7 @@ These examples show proper report structure, formatting, status indicators (✓ 
 
 ### 3. Analyze Against Best Practices
 
-Evaluate the skill across **8 dimensions**:
+Evaluate the skill across **10 dimensions**:
 
 #### Dimension 1: Size & Length
 **Guidelines:**
@@ -78,7 +80,32 @@ Evaluate the skill across **8 dimensions**:
 - Compliment if well-sized (ideal: 100-300 lines for medium skills)
 - Check if TOC exists (expected for 100+ line skills)
 
-#### Dimension 2: Scope Definition
+#### Dimension 2: Token Economy
+**Guidelines:**
+- Default assumption: Claude is already very smart
+- Challenge each piece of information: "Does Claude really need this explanation?"
+- Avoid over-explaining concepts Claude already knows (e.g., what PDFs are, how libraries work)
+- Concise examples preferred over verbose explanations
+
+**Assessment:**
+- Are there paragraphs explaining concepts Claude inherently knows?
+- Could explanations be shortened without losing meaning?
+- Is the skill concise within its size limits, or padded with unnecessary context?
+- Does each section justify its token cost?
+
+#### Dimension 3: Degrees of Freedom
+**Guidelines:**
+- High freedom (text-based instructions): Use when multiple approaches are valid or decisions depend on context
+- Medium freedom (pseudocode/scripts with parameters): Use when a preferred pattern exists but variation is acceptable
+- Low freedom (specific scripts, few parameters): Use when operations are fragile, consistency is critical, or exact sequence required
+
+**Assessment:**
+- Does the skill match instruction specificity to task fragility?
+- Are fragile/destructive operations given explicit, low-freedom instructions?
+- Are context-dependent tasks given appropriate flexibility?
+- Does the skill avoid over-constraining where multiple valid approaches exist?
+
+#### Dimension 4: Scope Definition
 **Guidelines:**
 - Narrow focus (one skill = one capability)
 - Clear boundary of what the skill does and doesn't do
@@ -89,7 +116,7 @@ Evaluate the skill across **8 dimensions**:
 - Are there multiple conflicting capabilities within one skill?
 - Is the boundary clear to a new user?
 
-#### Dimension 3: Description Quality
+#### Dimension 5: Description Quality
 **Guidelines:**
 - Third-person voice (avoid "I can" or "you can")
 - Include both WHAT and WHEN TO USE
@@ -101,7 +128,7 @@ Evaluate the skill across **8 dimensions**:
 - Discovery terms clear? (Would users search for these terms?)
 - Is "when to use" explained?
 
-#### Dimension 4: Structure & Organization
+#### Dimension 6: Structure & Organization
 **Guidelines:**
 - Clear section hierarchy (headings, subsections)
 - Logical flow (progressive disclosure)
@@ -113,7 +140,7 @@ Evaluate the skill across **8 dimensions**:
 - Can a user easily navigate?
 - Are instructions sequential or scattered?
 
-#### Dimension 5: Examples
+#### Dimension 7: Examples
 **Guidelines:**
 - Quality over quantity
 - Typical: 2-3 examples for basic skills, more for format-heavy
@@ -126,25 +153,28 @@ Evaluate the skill across **8 dimensions**:
 - Do they demonstrate key patterns?
 - Are there enough to show variations?
 
-#### Dimension 6: Anti-Pattern Detection
+#### Dimension 8: Anti-Pattern Detection
 **Red flags (check for these):**
 - ❌ Windows-style paths (should use forward slashes)
 - ❌ Magic numbers without justification
 - ❌ Vague terminology (inconsistent synonyms)
 - ❌ Time-sensitive instructions (date-dependent)
-- ❌ Deeply nested file references (over 2 levels)
+- ❌ Nested file references (over 1 level from SKILL.md - all reference files should link directly from SKILL.md)
 - ❌ Vague descriptions (missing WHAT or WHEN)
 - ❌ Scope creep (trying to do too much)
 - ❌ No error handling or validation steps
 - ❌ No user feedback loops (for complex workflows)
 - ❌ Multiple conflicting approaches for same task
+- ❌ MCP tool references without server prefix (should use `ServerName:tool_name` format)
+- ❌ Assumed package availability (missing explicit installation instructions)
+- ❌ Vague/generic naming (`helper`, `utils`, `tools` instead of gerund form like `processing-pdfs`)
 
 **Assessment:**
 - Count violations
 - Severity of each violation
 - Impact on usability
 
-#### Dimension 7: Prompt Engineering Quality
+#### Dimension 9: Prompt Engineering Quality
 **Guidelines:**
 - Imperative language (verb-first instructions)
 - Explicit rules with clear boundaries
@@ -158,7 +188,7 @@ Evaluate the skill across **8 dimensions**:
 - How clear are the rules?
 - Is error handling explicit?
 
-#### Dimension 8: Completeness
+#### Dimension 10: Completeness
 **Guidelines:**
 - Requirements listed (what's needed to use the skill)
 - Edge cases acknowledged
@@ -177,7 +207,7 @@ Create a detailed evaluation report with these components:
 
 2. **Metrics**: Present line count, word count, character count, and guideline compliance assessment
 
-3. **Dimensional Analysis**: For each of the 8 dimensions:
+3. **Dimensional Analysis**: For each of the 10 dimensions:
    - Status indicator (✓ Pass / ⚠ Warning / ❌ Fail)
    - 1-2 sentence assessment explaining the rating
 
