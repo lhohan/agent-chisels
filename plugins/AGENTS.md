@@ -10,10 +10,9 @@ All plugins go in `plugins/[plugin-name]/`:
 
 ```
 plugins/
-├── marketplace.json           # Single source of truth for all published plugins
 └── [plugin-name]/
     ├── .claude-plugin/
-    │   └── plugin.json        # Plugin metadata (name, version, description)
+    │   └── plugin.json        # Plugin metadata (name only)
     ├── skills/
     │   └── [skill-name]/
     │       ├── SKILL.md       # Skill definition
@@ -21,6 +20,10 @@ plugins/
     ├── commands/
     ├── agents/
     └── hooks/
+
+Root-level:
+├── .claude-plugin/
+│   └── marketplace.json       # Single source of truth for all published plugins
 ```
 
 ### Naming Conventions
@@ -69,10 +72,10 @@ Decisions should be updated so the decision log and implementation stay consiste
    - Test commands and agents as applicable
 
 3. **Update documentation**:
-   - Add new skills to `plugins/README.md` with name and concise description (1-3 sentences max)
-   - Update versions in both:
-     - `plugins/[plugin-name]/.claude-plugin/plugin.json`
-     - `plugins/marketplace.json`
+    - Add new skills to `plugins/README.md` with name and concise description (1-3 sentences max)
+    - Update versions in both:
+      - `plugins/[plugin-name]/.claude-plugin/plugin.json`
+      - `.claude-plugin/marketplace.json` (at root)
 
 4. **Commit changes**:
 5. **Tag the release**:
@@ -80,8 +83,8 @@ Decisions should be updated so the decision log and implementation stay consiste
 
 ### Marketplace Distribution
 
-Once pushed, the `plugins/marketplace.json` is published. Users can then:
-- Add the marketplace: `/plugin marketplace add agent-chisels https://raw.githubusercontent.com/lhohan/agent-chisels/main/plugins/marketplace.json`
+Once pushed, the `.claude-plugin/marketplace.json` is published. Users can then:
+- Add the marketplace: `/plugin marketplace add agent-chisels https://raw.githubusercontent.com/lhohan/agent-chisels/main/.claude-plugin/marketplace.json`
 - Install plugins: `/plugin install [plugin-name]@agent-chisels`
 
 **Key Points**:

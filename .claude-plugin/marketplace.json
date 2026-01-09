@@ -4,11 +4,15 @@
     "name": "Hans L'Hoest",
     "email": "agent-chisels@hanlho.simplelogin.com"
   },
+  "metadata": {
+    "description": "Hans L'Hoest (hanlho)'s Claude Code plugins",
+    "version": "1.0.0"
+  },
   "plugins": [
     {
       "name": "agent-tools",
-      "source": "./agent-tools",
-      "description": "Core tools and skills for AI agents",
+      "source": "./plugins/agent-tools",
+      "description": "Core tools and skills for AI agents. Includes evaluating-skills, ...",
       "version": "1.0.0",
       "category": "agent-tools",
       "keywords": ["skills", "evaluation", "quality-assurance"]

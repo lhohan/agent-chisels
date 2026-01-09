@@ -17,11 +17,10 @@ The repository is organized as follows:
 ```
 agent-chisels/
 ├── AGENTS.md                    # This file (general guidelines)
+├── .claude-plugin/
+│   └── marketplace.json         # Published plugins registry
 ├── plugins/                     # Claude Code plugins
 │   ├── AGENTS.md                # Plugin development guide (detailed)
-│   ├── marketplace.json         # Published plugins registry
-│   ├── .claude-plugin/
-│   │   └── marketplace.json
 │   └── [plugin-name]/
 │       ├── .claude-plugin/
 │       │   └── plugin.json
