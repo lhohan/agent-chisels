@@ -1,0 +1,16 @@
+{
+  "description": "Jujutsu VCS integration hook",
+  "hooks": {
+    "SessionStart": [
+      {
+        "description": "Remind Claude to use jj commands instead of git in Jujutsu repositories",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash ${CLAUDE_PLUGIN_ROOT}/hooks-handlers/jj-reminder.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
