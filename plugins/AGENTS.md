@@ -28,7 +28,7 @@ Root-level:
 
 ### Naming Conventions
 
-- **Plugin names**: kebab-case (e.g., `agent-tools`, `jujutsu-vcs`)
+- **Plugin names**: kebab-case (e.g., `agent-tools`, `jj`)
 - **Skill names**: kebab-case (e.g., `evaluating-skills`, `code-reviewer`)
 - **Skill files**: `SKILL.md` (uppercase, required)
 

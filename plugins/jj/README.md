@@ -33,3 +33,7 @@ This plugin adds minimal tokens to each session in Jujutsu repositories by using
 
 ## Why Hooks?
 We use hooks over skills for initial detection because VCS constraints are non-negotiable. Hooks guarantee the context is present from the first prompt, overcoming the strong training bias towards `git`. See [decision-log.md](./decision-log.md) for more details.
+
+## Plugin history
+
+To understand the context of this plugin, and why things are implemented the way they are, better also consult the [decision-log.md](./decision-log.md).

@@ -1,6 +1,7 @@
 ---
 name: evaluating-skills
 description: Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
+version: "1.0.0"
 ---
 
 # Claude Code Skill Evaluator
