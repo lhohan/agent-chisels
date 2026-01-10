@@ -4,9 +4,8 @@
 
 > **In the context of** providing reliable Jujutsu (jj) VCS support across diverse repository structures,
 > **facing** duplicated detection logic and the risk of "double detection" between the hook and the skills,
-> **we decided** to extract the detection logic into a shared, root-aware script (`scripts/detect-jj.sh`) that uses `jj status` as the authoritative check,
-> **to achieve** a single source of truth for repository detection, better reliability in root-relative paths, and cleaner separation between the hook (deterministic gating) and the skill (interactive guidance),
-> **accepting** a small dependency on the `git` command to find the repository root.
+> **we decided** to extract the detection logic into a script (`scripts/detect-jj.sh`) as an authoritative check,
+> **to achieve** a single source of truth for repository detection, better reliability in root-relative paths, and cleaner separation between the hook (deterministic gating) and the skill (interactive guidance)
 
 ### JJ-004: Strengthened Reminder Language [Yes]
 

@@ -4,14 +4,14 @@
 # Uses shared detection script to gate context injection.
 
 # 1. Authoritative detection (root-aware)
-if ! bash "${CLAUDE_PLUGIN_ROOT}/scripts/detect-jj.sh" --quiet; then
+if ! bash "${CLAUDE_PLUGIN_ROOT}/skills/detecting-jujutsu/scripts/detect-jj.sh" --quiet; then
   exit 0
 fi
 
 # 2. Construct concise reminder
 CONTEXT="**CRITICAL: Jujutsu (jj) repository detected.**
 
-Always use \`jj\` commands for version control operations in this repository. 
+Always use \`jj\` commands for version control operations in this repository.
 
 **Guidance**:
 - If you are uncertain about the VCS state (e.g. cwd changed), invoke the \`detecting-jujutsu\` skill.
@@ -30,4 +30,10 @@ echo "{
     \"additionalContext\": \"$ESCAPED_CONTEXT\"
   }
 }"
+echo "{
+  \"hookSpecificOutput\": {
+    \"hookEventName\": \"SessionStart\",
+    \"additionalContext\": \"$ESCAPED_CONTEXT\"
+  }
+}" > .claude/test-hook.txt
 exit 0

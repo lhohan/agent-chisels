@@ -13,8 +13,10 @@ This repository uses **Jujutsu (jj)** as its version control if confirmed by the
 To verify if this is a Jujutsu repository, you **MUST** run the following script using the Bash tool:
 
 ```bash
-bash ${CLAUDE_PLUGIN_ROOT}/scripts/detect-jj.sh
+bash scripts/detect-jj.sh"
 ```
+
+This works from any plugin by resolving the path relative to the skill's location.
 
 ### Interpreting the Result
 
