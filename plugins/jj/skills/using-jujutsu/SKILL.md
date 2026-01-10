@@ -14,7 +14,8 @@ This guide provides the definitive instruction set for working with **Jujutsu (j
 - Check status: `jj st --no-pager`
 - View history: `jj log --no-pager`
 - Create commit: `jj commit -m "message"`
-- Only commit related changes: `jj commit -m "message"` [FILESETS]
+- Only commit related changes: `jj commit -m "message" <filesets>`
+  - Example: `jj commit -m "fix auth bug" src/auth.rs tests/auth_test.rs`
   - NEVER restore files to exclude them from a commit.
 - Push: `jj git push`
 - Push main: `jj bookmark set main -r @- && jj git push`

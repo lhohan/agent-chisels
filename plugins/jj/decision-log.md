@@ -31,3 +31,13 @@
 > **we decided** to use a lightweight SessionStart hook for initial "critical" reminders and a comprehensive `jj` skill (based on `jj-vcs.md`) for deep guidance,
 > **to achieve** a balance of guaranteed awareness and on-demand instruction without bloating the persistent context window,
 > **accepting** that the model must semantically recognize VCS tasks to invoke the skill, which is mitigated by the hook's persistent reminder of the skill's existence.
+
+### JJ-001: Use Hooks Over Skills for Jujutsu VCS Integration [Superseded by JJ-002]
+
+> **In the context of** integrating Jujutsu (jj) VCS support into Claude Code,
+> **facing** the challenge of overcoming the LLM's strong training bias toward `git`,
+> **we decided** to use a SessionStart hook to automatically inject Jujutsu-specific context when a `.jj/` directory is detected,
+> **to achieve** maximum reliability by ensuring VCS constraints are present before task analysis,
+> **accepting** a token overhead of ~150-200 tokens per session.
+
+**Status**: Superseded by JJ-002 (hybrid approach reduces token overhead ~75%)

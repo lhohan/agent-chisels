@@ -19,7 +19,7 @@
     {
       "name": "jj",
       "source": "./plugins/jj",
-      "description": "Ensures Claude Code uses Jujutsu (jj) commands instead of git. Includes SessionStart hook and /use-jj command.",
+      "description": "Comprehensive Jujutsu (jj) VCS support with automatic detection, split skills for verification and guidance, and detailed command reference.",
       "version": "1.0.0",
       "category": "vcs",
       "keywords": ["jujutsu", "jj", "vcs", "version-control"]

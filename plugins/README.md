@@ -4,9 +4,13 @@
 
 Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
 
-## [jj](./jj)
+## [detecting-jujutsu](./jj/skills/detecting-jujutsu/SKILL.md) [[jj](./jj)]
 
-Ensures Claude Code uses Jujutsu (jj) commands instead of git in Jujutsu repositories. Includes a SessionStart hook for automatic context injection and a manual `/use-jj` command.
+Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
+
+## [using-jujutsu](./jj/skills/using-jujutsu/SKILL.md) [[jj](./jj)]
+
+Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and revsets.
 
 ## [documenting-architectural-decisions](./documenting-architectural-decisions/skills/adr-architect/SKILL.md) [[documenting-architectural-decisions](./documenting-architectural-decisions)]
 
