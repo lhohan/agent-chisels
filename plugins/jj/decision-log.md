@@ -1,5 +1,15 @@
 # Decision Log
 
+### JJ-006: Keep Simple SessionStart Hook [Yes]
+
+> **In the context of** improving jj reminder effectiveness in long sessions,
+> **facing** options to use UserPromptSubmit hooks with VCS keyword matchers for more persistent reminders,
+> **we decided** to keep the current simple SessionStart hook and rely on the `/use-jj` command for manual reinforcement,
+> **to achieve** simplicity and avoid overhead of prompt inspection on every VCS-related message,
+> **accepting** that long sessions may occasionally need manual `/use-jj` invocation.
+
+See `backlog/jj-userpromptsubmit-hooks.md` for research on UserPromptSubmit alternatives.
+
 ### JJ-005: Shared Root-Aware Detection Script [Yes]
 
 > **In the context of** providing reliable Jujutsu (jj) VCS support across diverse repository structures,
