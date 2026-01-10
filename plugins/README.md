@@ -1,17 +1,13 @@
-# Available Skills
+# Plugins
 
-## [evaluating-skills](./agent-tools/skills/evaluating-skills/SKILL.md) [[agent-tools](./agent-tools)]
+This directory contains Claude Code plugins. Each plugin can include one or more skills, which are symlinked from the top-level [skills/](../skills) directory.
 
-Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
+## Plugin to Skill Mapping
 
-## [detecting-jujutsu](./jj/skills/detecting-jujutsu/SKILL.md) [[jj](./jj)]
+| Plugin | Skills |
+|--------|--------|
+| [agent-tools](./agent-tools) | [evaluating-skills](../skills/evaluating-skills) |
+| [jj](./jj) | [detecting-jujutsu](../skills/detecting-jujutsu), [using-jujutsu](../skills/using-jujutsu) |
+| [documenting-architectural-decisions](./documenting-architectural-decisions) | [documenting-architectural-decisions](../skills/documenting-architectural-decisions) |
 
-Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
-
-## [using-jujutsu](./jj/skills/using-jujutsu/SKILL.md) [[jj](./jj)]
-
-Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and revsets.
-
-## [documenting-architectural-decisions](./documenting-architectural-decisions/skills/adr-architect/SKILL.md) [[documenting-architectural-decisions](./documenting-architectural-decisions)]
-
-Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, searching, or managing decision records.
+For detailed descriptions of each skill, see the [Skills README](../skills/README.md).

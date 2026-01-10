@@ -30,10 +30,4 @@ echo "{
     \"additionalContext\": \"$ESCAPED_CONTEXT\"
   }
 }"
-echo "{
-  \"hookSpecificOutput\": {
-    \"hookEventName\": \"SessionStart\",
-    \"additionalContext\": \"$ESCAPED_CONTEXT\"
-  }
-}" > .claude/test-hook.txt
 exit 0

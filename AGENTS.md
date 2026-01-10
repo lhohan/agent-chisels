@@ -8,7 +8,8 @@ This document provides general guidelines for the agent-chisels repository and p
 
 The repository is organized as follows:
 
-- **plugins/**: Claude Code plugins with skills, commands, and agents
+- **skills/**: Reusable AI skills (source of truth)
+- **plugins/**: Claude Code plugins that compose skills, commands, and agents
 - **docs/**: General documentation and guides
 - **backlog/**: Future work and planned features
 
@@ -19,12 +20,16 @@ agent-chisels/
 ├── AGENTS.md                    # This file (general guidelines)
 ├── .claude-plugin/
 │   └── marketplace.json         # Published plugins registry
+├── skills/                      # Reusable AI skills (source of truth)
+│   └── [skill-name]/
+│       ├── SKILL.md             # Skill definition
+│       └── examples/            # Example files
 ├── plugins/                     # Claude Code plugins
 │   ├── AGENTS.md                # Plugin development guide (detailed)
 │   └── [plugin-name]/
 │       ├── .claude-plugin/
 │       │   └── plugin.json
-│       ├── skills/
+│       ├── skills/              # Symlinks to ../../skills/[skill-name]
 │       ├── commands/
 │       ├── agents/
 │       └── hooks/
