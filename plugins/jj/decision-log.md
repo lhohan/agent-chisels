@@ -8,7 +8,7 @@
 > **to achieve** simplicity and avoid overhead of prompt inspection on every VCS-related message,
 > **accepting** that long sessions may occasionally need manual `/use-jj` invocation.
 
-See `backlog/jj-userpromptsubmit-hooks.md` for research on UserPromptSubmit alternatives.
+See `../../docs/backlog/jj-userpromptsubmit-hooks.md` for research on UserPromptSubmit alternatives.
 
 ### JJ-005: Shared Root-Aware Detection Script [Yes]
 
