@@ -19,19 +19,8 @@ plugins/
     └── hooks/
 ```
 
-plugins/
-└── [plugin-name]/
-    ├── .claude-plugin/
-    │   └── plugin.json        # Plugin metadata (name only)
-    ├── skills/
-    │   └── [skill-name]/
-    │       ├── SKILL.md       # Skill definition
-    │       └── examples/      # Example files
-    ├── commands/
-    ├── agents/
-    └── hooks/
-
-Root-level:
+At the root-level of repository:
+```
 ├── .claude-plugin/
 │   └── marketplace.json       # Single source of truth for all published plugins
 ```
@@ -78,7 +67,7 @@ Decisions should be updated so the decision log and implementation stay consiste
    ```
 
 2. **Test thoroughly**: 
-   - Use `evaluating-skills` for all skills
+   - Use the `evaluating-skills` skill for all skills
    - Test commands and agents as applicable
 
 3. **Update documentation**:
@@ -94,9 +83,7 @@ Decisions should be updated so the decision log and implementation stay consiste
 
 ### Marketplace Distribution
 
-Once pushed, the `.claude-plugin/marketplace.json` is published. Users can then:
-- Add the marketplace: `/plugin marketplace add agent-chisels https://raw.githubusercontent.com/lhohan/agent-chisels/main/.claude-plugin/marketplace.json`
-- Install plugins: `/plugin install [plugin-name]@agent-chisels`
+Once pushed, the `.claude-plugin/marketplace.json` is published users can add the marketplace `/plugin marketplace add lhohan/agent-chisels` and install plugins: `/plugin install [plugin-name]@agent-chisels`
 
 **Key Points**:
 - Plugin changes to the marketplace manifest (adding/removing plugins, version bumps) take effect when pushed.
