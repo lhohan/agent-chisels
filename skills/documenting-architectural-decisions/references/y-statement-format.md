@@ -55,7 +55,7 @@ Y-Statements are organized with a heading for each decision, followed by the sta
 
 **Format**:
 ```markdown
-### PREFIX-NNN: [Brief description] [Status: Yes/No/Partial]
+### PREFIX-NNN: [Brief description] [Status: Proposed/Accepted/Deprecated/Implemented/Superseded]
 
 > **In the context of** [context],
 > **facing** [requirement/constraint],

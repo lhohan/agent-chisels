@@ -24,6 +24,7 @@ Current state of the decision. Used to track whether decisions are still active,
 **Valid values**:
 - **Proposed**: Under consideration, not yet accepted
 - **Accepted**: Agreed upon and being implemented
+- **Implemented**: Implemented and live.
 - **Deprecated**: No longer relevant, superseded
 - **Superseded**: Replaced by another ADR (reference the new one)
 
