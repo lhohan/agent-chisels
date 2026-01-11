@@ -1,12 +1,12 @@
 ---
 name: detecting-jujutsu
 description: Verify if the current repository uses Jujutsu (jj) instead of git. Use this skill when you or the user needs to confirm the version control system (VCS) state before performing operations.
-version: 1.1.0
+version: 0.2.0
 ---
 
 # Detecting Jujutsu (jj)
 
-This repository uses **Jujutsu (jj)** as its version control if confirmed by the authoritative detection script.
+This repository uses **Jujutsu (jj)** as its version control if confirmed by the authoritative detection script built for this project.
 
 ## Detection Procedure
 

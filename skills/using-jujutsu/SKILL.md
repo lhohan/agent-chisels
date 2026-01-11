@@ -1,7 +1,7 @@
 ---
 name: using-jujutsu
 description: This skill should be used for detailed guidance on Jujutsu (jj) VCS operations, including committing, pushing, searching history, and working with revisions/revsets. Use it when the user asks "how do I use jj?", "translate git to jj", ask to interact with VCS using jj or for specific jj command syntax.
-version: 1.0.0
+version: 0.3.0
 ---
 
 # Using Jujutsu (jj) VCS

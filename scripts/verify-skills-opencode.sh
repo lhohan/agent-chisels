@@ -32,13 +32,20 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Expected skills to verify
-declare -a EXPECTED_SKILLS=(
-    "detecting-jujutsu"
-    "using-jujutsu"
-    "evaluating-skills"
-    "documenting-architectural-decisions"
-)
+SKILLS_DIR="$REPO_ROOT/skills"
+
+##############################################################################
+# Discover all skills in the skills directory
+##############################################################################
+discover_skills() {
+    find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort
+}
+
+# Get expected skills (auto-discover)
+declare -a EXPECTED_SKILLS
+while IFS= read -r skill; do
+    EXPECTED_SKILLS+=("$skill")
+done < <(discover_skills)
 
 # Configuration
 OPENCODE_MODEL="opencode/gpt-5-nano"
@@ -104,8 +111,10 @@ if ! check_prerequisites; then
     exit 2
 fi
 
+TOTAL_TESTS=${#EXPECTED_SKILLS[@]}
+
 echo "TAP version 14"
-echo "1..$((${#EXPECTED_SKILLS[@]}))"
+echo "1..$TOTAL_TESTS"
 echo ""
 
 # Run opencode with timeout
@@ -134,7 +143,7 @@ for skill_name in "${EXPECTED_SKILLS[@]}"; do
 done
 
 echo ""
-echo "# Tests: $PASS passed, $FAIL failed out of $((${#EXPECTED_SKILLS[@]}))"
+echo "# Tests: $PASS passed, $FAIL failed out of $TOTAL_TESTS"
 
 if [[ $FAIL -gt 0 ]]; then
     echo "# Full opencode output:"

@@ -41,18 +41,19 @@ Decisions should be updated so the decision log and implementation stay consiste
 
 ## Plugin Version Policy
 
-**Policy**: All new Claude Code plugins start at version **1.0.0**.
+**Policy**: All new Claude Code plugins start at version **0.1.0**.
 
 **Rationale**:
 - Version `0.x.x` implies experimental or unstable status.
-- By the time a plugin is ready for the repository, it has been tested and is production-ready.
+-   However, by the time a plugin is ready for the repository, it has been tested and successfully used in projects.
 - Starting at `1.0.0` signals maturity and provides clear communication to users.
 - Follows semantic versioning conventions.
 
 **Examples**:
-- Initial release of `agent-tools` plugin: `1.0.0`
-- Bug fix to `agent-tools`: `1.0.1`
-- New feature in `agent-tools`: `1.1.0`
+- Initial release of `agent-tools` plugin: `0.1.0`
+- Bug fix to `agent-tools`: `0.1.1`
+- New feature in `agent-tools`: `0.2.0`
+- First stable release of `agent-tools`: `1.0.0`
 - Breaking changes to `agent-tools`: `2.0.0`
 
 ## Plugin Publishing Workflow

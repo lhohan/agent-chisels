@@ -27,13 +27,18 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 SKILLS_DIR="$REPO_ROOT/skills"
 
-# Expected skills to validate
-declare -a EXPECTED_SKILLS=(
-    "detecting-jujutsu"
-    "using-jujutsu"
-    "evaluating-skills"
-    "documenting-architectural-decisions"
-)
+##############################################################################
+# Discover all skills in the skills directory
+##############################################################################
+discover_skills() {
+    find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort
+}
+
+# Get expected skills (auto-discover)
+declare -a EXPECTED_SKILLS
+while IFS= read -r skill; do
+    EXPECTED_SKILLS+=("$skill")
+done < <(discover_skills)
 
 # Counters
 PASS=0
@@ -71,11 +76,11 @@ extract_frontmatter_field() {
 # Main Logic
 ##############################################################################
 
-echo "TAP version 14"
-echo "1..$((${#EXPECTED_SKILLS[@]} * 5))"
-echo ""
-
 TOTAL_TESTS=$((${#EXPECTED_SKILLS[@]} * 5))
+
+echo "TAP version 14"
+echo "1..$TOTAL_TESTS"
+echo ""
 
 for skill_name in "${EXPECTED_SKILLS[@]}"; do
     skill_path="$SKILLS_DIR/$skill_name"

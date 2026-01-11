@@ -20,7 +20,6 @@
       "name": "jj",
       "source": "./plugins/jj",
       "description": "Comprehensive Jujutsu (jj) VCS support with automatic detection, split skills for verification and guidance, and detailed command reference.",
-      "version": "1.0.0",
       "category": "vcs",
       "keywords": ["jujutsu", "jj", "vcs", "version-control"]
     },
@@ -28,7 +27,6 @@
       "name": "documenting-architectural-decisions",
       "source": "./plugins/documenting-architectural-decisions",
       "description": "Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats.",
-      "version": "1.0.0",
       "category": "documentation",
       "keywords": ["adr", "architecture", "decisions", "documentation"]
     }
