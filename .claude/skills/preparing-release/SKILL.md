@@ -10,6 +10,14 @@ Use this skill to prepare skills for release. It detects which skills have chang
 
 This skill automates the release preparation workflow and ensures all skills have proper version updates.
 
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Release Preparation Workflow](#release-preparation-workflow)
+- [Tips and Best Practices](#tips-and-best-practices)
+- [Error Handling](#error-handling)
+- [Example Output](#example-output)
+
 ## Prerequisites
 
 Before using this skill:
