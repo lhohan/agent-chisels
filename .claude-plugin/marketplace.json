@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Hans L'Hoest (hanlho)'s Claude Code plugins",
-    "version": "1.0.0"
+    "version": "1.0.1"
   },
   "plugins": [
     {
@@ -14,21 +14,30 @@
       "source": "./plugins/agent-tools",
       "description": "Core tools and skills for AI agents. Includes evaluating-skills, ...",
       "category": "agent-tools",
-      "keywords": ["skills", "evaluation", "quality-assurance"]
+      "keywords": ["skills", "evaluation", "quality-assurance"],
+      "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/agent-tools",
+      "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/agent-tools",
+      "license": "MIT"
     },
     {
       "name": "jj",
       "source": "./plugins/jj",
       "description": "Comprehensive Jujutsu (jj) VCS support with automatic detection, split skills for verification and guidance, and detailed command reference.",
       "category": "vcs",
-      "keywords": ["jujutsu", "jj", "vcs", "version-control"]
+      "keywords": ["jujutsu", "jj", "vcs", "version-control"],
+      "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/jj",
+      "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/jj",
+      "license": "MIT"
     },
     {
       "name": "documenting-architectural-decisions",
       "source": "./plugins/documenting-architectural-decisions",
       "description": "Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats.",
       "category": "documentation",
-      "keywords": ["adr", "architecture", "decisions", "documentation"]
+      "keywords": ["adr", "architecture", "decisions", "documentation"],
+      "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/documenting-architectural-decisions",
+      "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/documenting-architectural-decisions",
+      "license": "MIT"
     }
   ]
 }
