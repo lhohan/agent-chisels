@@ -1,10 +1,10 @@
 ---
-name: preparing-release
+name: verify-release-readiness
 version: 0.1.0
-description: Automate release preparation by detecting changed skills, reporting version status, running validation scripts, and generating release summary. Use before creating releases or publishing to marketplace.
+description: Verify release readiness by detecting changed skills, checking version updates, and running validation scripts. Use before creating releases or publishing to marketplace.
 ---
 
-# Preparing a Release
+# Verify Release Readiness
 
 Use this skill to prepare skills for release. It detects which skills have changed since the last release and reports whether versions were updated accordingly.
 
@@ -32,7 +32,7 @@ Before using this skill:
 Run the detection script using the Bash tool:
 
 ```bash
-bash .claude/skills/preparing-release/scripts/detect-changes.sh
+bash .claude/skills/verify-release-readiness/scripts/detect-changes.sh
 ```
 
 This script:
@@ -49,12 +49,12 @@ This script:
 **Optional: Compare against a different revision**:
 
 ```bash
-bash .claude/skills/preparing-release/scripts/detect-changes.sh <revision>
+bash .claude/skills/verify-release-readiness/scripts/detect-changes.sh <revision>
 ```
 
 Examples:
-- `bash .claude/skills/preparing-release/scripts/detect-changes.sh main` - Compare against local main bookmark
-- `bash .claude/skills/preparing-release/scripts/detect-changes.sh @-` - Compare against parent commit
+- `bash .claude/skills/verify-release-readiness/scripts/detect-changes.sh main` - Compare against local main bookmark
+- `bash .claude/skills/verify-release-readiness/scripts/detect-changes.sh @-` - Compare against parent commit
 
 ### Step 2: Parse and Report Findings
 
@@ -139,7 +139,7 @@ Ready to commit and release!
 **If no changes detected (exit code 1)**:
 - Tell the user: "No skill changes detected since the last published release (main@origin)"
 - Suggest they verify they've made changes and committed them locally
-- They can also use `bash .claude/skills/preparing-release/scripts/detect-changes.sh main` to compare against the local main bookmark instead
+- They can also use `bash .claude/skills/verify-release-readiness/scripts/detect-changes.sh main` to compare against the local main bookmark instead
 
 **If verification fails**:
 - Show the TAP output to the user
