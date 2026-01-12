@@ -1,5 +1,6 @@
 ---
 name: preparing-release
+version: 0.1.0
 description: Automate release preparation by detecting changed skills, reporting version status, running validation scripts, and generating release summary. Use before creating releases or publishing to marketplace.
 ---
 
