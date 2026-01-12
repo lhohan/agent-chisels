@@ -20,6 +20,8 @@ agent-chisels/
 ├── AGENTS.md                    # This file (general guidelines)
 ├── .claude-plugin/
 │   └── marketplace.json         # Published plugins registry
+├── .claude/
+│   └── skills/                  # Project-level skills (internal use)
 ├── skills/                      # Reusable AI skills (source of truth)
 │   └── [skill-name]/
 │       ├── SKILL.md             # Skill definition
@@ -47,3 +49,15 @@ Refer to that document for:
 - Quality assurance with `evaluating-skills`
 - Version management and publishing workflows
 - Marketplace distribution
+
+## Release Workflow
+
+Before publishing or committing skills or plugins to the marketplace, use the internal `verify-release-readiness` skill:
+
+1. Load the skill: it will detect changed skills since the last release (`main@origin`)
+2. Review the report — skills with unchanged versions will be flagged
+3. Manually update version numbers in SKILL.md frontmatter for flagged skills
+4. Run verification scripts to ensure all skills pass validation
+5. Commit and push to publish
+
+The skill is located at `.claude/skills/verify-release-readiness/SKILL.md` and provides detailed step-by-step guidance.
