@@ -23,6 +23,10 @@
 
 set -e
 
+# Create temporary file and ensure cleanup
+CHANGES_FILE=$(mktemp)
+trap "rm -f $CHANGES_FILE" EXIT
+
 # Get the repo root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
@@ -52,7 +56,7 @@ if ! jj st --no-pager > /dev/null 2>&1; then
 fi
 
 # Get the list of changed files (comparing current @ to main)
-if ! jj diff --from main@origin --to @ --summary --no-pager > /tmp/changes.txt 2>&1; then
+if ! jj diff --from main@origin --to @ --summary --no-pager > "$CHANGES_FILE" 2>&1; then
     echo "Error: Failed to get changes from main bookmark" >&2
     exit 2
 fi
@@ -112,8 +116,8 @@ while IFS= read -r line; do
             changed_skills+=("$skill_name")
         fi
         skill_changes+=("$line")
-    fi
-done < /tmp/changes.txt
+     fi
+done < "$CHANGES_FILE"
 
 # If no changes detected
 if [[ ${#changed_skills[@]} -eq 0 ]]; then
@@ -163,9 +167,9 @@ for skill_name in "${changed_skills[@]}"; do
                 changed_files="$changed_files\"$file_path\""
                 ((file_count++))
             fi
-        fi
-    done < /tmp/changes.txt
-    changed_files="$changed_files]"
+         fi
+     done < "$CHANGES_FILE"
+     changed_files="$changed_files]"
 
     # Add JSON entry
     if [[ "$first" == "true" ]]; then
