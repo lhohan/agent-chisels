@@ -60,6 +60,25 @@ Decisions should be updated so the decision log and implementation stay consiste
 
 **Policy**: Publishing a plugin is accomplished by pushing to the remote repository (e.g., GitHub).
 
+### Setup: Install Pre-Commit Hook (Recommended)
+
+**IMPORTANT**: Before developing skills, install the pre-commit hook to automatically enforce version updates:
+
+```bash
+# For Git repositories
+ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-commit .git/hooks/pre-commit
+
+# For Jujutsu repositories
+# Add to .jj/repo/config.toml:
+# [hooks]
+# pre-commit = ".claude/skills/verify-release-readiness/hooks/pre-commit"
+```
+
+This hook will:
+- Automatically detect when you modify skills
+- Block commits if you forget to update version numbers
+- Guide you on which versions need updating
+
 ### Publishing Steps
 
 1. **Develop locally**:
@@ -67,7 +86,7 @@ Decisions should be updated so the decision log and implementation stay consiste
    claude --plugin-dir ./plugins/[plugin-name]
    ```
 
-2. **Test thoroughly**: 
+2. **Test thoroughly**:
    - Use the `evaluating-skills` skill for all skills
    - Test commands and agents as applicable
 
@@ -77,8 +96,13 @@ Decisions should be updated so the decision log and implementation stay consiste
     - Update versions in both:
       - `plugins/[plugin-name]/.claude-plugin/plugin.json`
       - `.claude-plugin/marketplace.json` (at root)
+    - **CRITICAL**: Update version in `skills/[skill-name]/SKILL.md` frontmatter if skill changed
+      - The pre-commit hook will enforce this if installed
 
 4. **Commit changes**:
+   - If pre-commit hook is installed, it will verify version updates
+   - Update any flagged skill versions before committing
+
 5. **Tag the release**:
 6. **Push to remote**:
 

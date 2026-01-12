@@ -10,6 +10,35 @@ Use this skill to prepare skills for release. It detects which skills have chang
 
 This skill automates the release preparation workflow and ensures all skills have proper version updates.
 
+## Automated vs Manual Usage
+
+This skill can be used in two ways:
+
+1. **Automated (Recommended)**: Install the pre-commit hook to automatically enforce version updates on every commit
+2. **Manual**: Invoke this skill manually before publishing to marketplace
+
+### Installing the Pre-Commit Hook
+
+**RECOMMENDED**: Install the pre-commit hook to make version checking deterministic:
+
+```bash
+# For Git repositories
+ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-commit .git/hooks/pre-commit
+
+# For Jujutsu repositories
+# Add to .jj/repo/config.toml:
+# [hooks]
+# pre-commit = ".claude/skills/verify-release-readiness/hooks/pre-commit"
+```
+
+Once installed:
+- ✅ Automatically runs before every commit
+- ✅ Blocks commits if skill versions aren't updated
+- ✅ Provides clear guidance on which versions need updating
+- ✅ Ensures you never forget to update versions
+
+The hook uses the same detection script as this skill, so behavior is consistent.
+
 ## Table of Contents
 
 - [Prerequisites](#prerequisites)
@@ -24,6 +53,7 @@ Before using this skill:
 - You are in a Jujutsu repository with a `main` bookmark and `main@origin` (remote tracking bookmark)
 - `jq` is installed (for JSON parsing)
 - You have the `scripts/verify-skills-static.sh` and `scripts/verify-skills-opencode.sh` scripts available
+- **(For automated mode)**: Pre-commit hook installed (see above)
 
 ## Release Preparation Workflow
 

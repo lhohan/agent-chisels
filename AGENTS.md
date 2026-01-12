@@ -52,6 +52,28 @@ Refer to that document for:
 
 ## Release Workflow
 
+### Automated Version Checking (Pre-Commit Hook)
+
+**RECOMMENDED**: Install the pre-commit hook to automatically enforce version updates:
+
+```bash
+# For Git repositories
+ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-commit .git/hooks/pre-commit
+
+# For Jujutsu repositories
+# Add to .jj/repo/config.toml:
+# [hooks]
+# pre-commit = ".claude/skills/verify-release-readiness/hooks/pre-commit"
+```
+
+Once installed, the hook will:
+- ✅ Automatically detect skill changes before each commit
+- ✅ Block commits if skill versions haven't been updated
+- ✅ Provide clear instructions on which versions need updating
+- ✅ Ensure you never forget to update versions
+
+### Manual Verification (Before Publishing)
+
 Before publishing or committing skills or plugins to the marketplace, use the internal `verify-release-readiness` skill:
 
 1. Load the skill: it will detect changed skills since the last release (`main@origin`)
@@ -61,3 +83,5 @@ Before publishing or committing skills or plugins to the marketplace, use the in
 5. Commit and push to publish
 
 The skill is located at `.claude/skills/verify-release-readiness/SKILL.md` and provides detailed step-by-step guidance.
+
+**Note**: If you've installed the pre-commit hook, steps 1-3 will be enforced automatically during commits.
