@@ -4,9 +4,10 @@
 # detect-changes.sh
 #
 # Purpose:
-#   Detects changed skills by comparing current revision (@) to main bookmark.
+#   Detects changed skills by comparing current revision to main.
 #   Identifies affected skills and extracts version information.
 #   Reports skills that need version updates based on changes since main.
+#   Supports both Git and Jujutsu repositories.
 #
 # Usage:
 #   ./detect-changes.sh
@@ -17,7 +18,7 @@
 # Exit codes:
 #   0 - Changes detected
 #   1 - No changes found
-#   2 - Error (not a jj repo, etc.)
+#   2 - Error (not a git/jj repo, etc.)
 #
 ##############################################################################
 
@@ -29,7 +30,9 @@ trap "rm -f $CHANGES_FILE" EXIT
 
 # Get the repo root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+# Script is in .claude/skills/verify-release-readiness/scripts/
+# Need to go up 4 levels to reach repo root
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../.." && pwd)"
 
 SKILLS_DIR="$REPO_ROOT/skills"
 
@@ -46,19 +49,39 @@ extract_frontmatter_field() {
 }
 
 ##############################################################################
-# Main Logic
+# VCS Detection
 ##############################################################################
 
-# Check if in jj repository
-if ! jj st --no-pager > /dev/null 2>&1; then
-    echo "Error: Not a Jujutsu repository" >&2
+# Detect VCS type
+if [ -d "$REPO_ROOT/.jj" ]; then
+    VCS="jj"
+    BASE_REF="main@origin"
+elif [ -d "$REPO_ROOT/.git" ]; then
+    VCS="git"
+    BASE_REF="origin/main"
+else
+    echo "Error: Not a Git or Jujutsu repository" >&2
     exit 2
 fi
 
-# Get the list of changed files (comparing current @ to main)
-if ! jj diff --from main@origin --to @ --summary --no-pager > "$CHANGES_FILE" 2>&1; then
-    echo "Error: Failed to get changes from main bookmark" >&2
-    exit 2
+##############################################################################
+# Main Logic
+##############################################################################
+
+# Get the list of changed files (comparing current to main)
+if [ "$VCS" = "jj" ]; then
+    # Jujutsu: compare @ to main@origin
+    if ! jj diff --from main@origin --to @ --summary --no-pager > "$CHANGES_FILE" 2>&1; then
+        echo "Error: Failed to get changes from main bookmark" >&2
+        exit 2
+    fi
+elif [ "$VCS" = "git" ]; then
+    # Git: compare HEAD to origin/main, show summary
+    # Use --name-status to get a similar format to jj diff --summary
+    if ! git diff --name-status origin/main...HEAD > "$CHANGES_FILE" 2>&1; then
+        echo "Error: Failed to get changes from origin/main" >&2
+        exit 2
+    fi
 fi
 
 # Extract skills that have changed
@@ -66,9 +89,9 @@ changed_skills=()
 skill_changes=()
 
 while IFS= read -r line; do
-    # Parse jj diff output format: "M    path/to/file"
+    # Parse diff output format: "M    path/to/file" (jj) or "M\tpath/to/file" (git)
     # We need to extract skill names from paths like: skills/skill-name/...
-    # ⏺ This regex matches the jj diff output format and extracts the skill name. Let me break it down:
+    # ⏺ This regex matches both git and jj diff output formats and extracts the skill name. Let me break it down:
     #   ^[[:space:]]*[A-Z][[:space:]]+skills/([^/]+)/
     #   Part: ^
     #   Meaning: Start of line - anchors to the beginning
@@ -93,12 +116,13 @@ while IFS= read -r line; do
     #   Meaning: Literal forward slash - the slash after the skill name
     #   Example
 
-    #   For this jj diff line:
-    #   M    skills/detecting-jujutsu/SKILL.md
+    #   For these diff lines:
+    #   Jujutsu: M    skills/detecting-jujutsu/SKILL.md
+    #   Git:     M\tskills/detecting-jujutsu/SKILL.md
 
-    #   The regex matches:
+    #   The regex matches both:
     #   - M - the status
-    #   -      (4 spaces) - the whitespace
+    #   -      (spaces or tab) - the whitespace
     #   - skills/ - the directory
     #   - detecting-jujutsu - captured as the skill name
     #   - / - the separator
@@ -143,9 +167,14 @@ for skill_name in "${changed_skills[@]}"; do
     # Get current version
     current_version=$(extract_frontmatter_field "$skill_file" "version")
 
-    # Get version from main bookmark using jj file show
-    # This gets the actual file content at the main revision
-    main_version=$(jj file show -r main@origin "$skill_file_rel" 2>/dev/null | sed -n '/^---$/,/^---$/p' | grep "^version:" | head -1 | sed "s/^version: *//" | tr -d '"' || echo "")
+    # Get version from main using VCS-specific commands
+    if [ "$VCS" = "jj" ]; then
+        # Jujutsu: use jj file show
+        main_version=$(jj file show -r main@origin "$skill_file_rel" 2>/dev/null | sed -n '/^---$/,/^---$/p' | grep "^version:" | head -1 | sed "s/^version: *//" | tr -d '"' || echo "")
+    elif [ "$VCS" = "git" ]; then
+        # Git: use git show
+        main_version=$(git show origin/main:"$skill_file_rel" 2>/dev/null | sed -n '/^---$/,/^---$/p' | grep "^version:" | head -1 | sed "s/^version: *//" | tr -d '"' || echo "")
+    fi
 
     # Determine if version needs update
     needs_update="false"
