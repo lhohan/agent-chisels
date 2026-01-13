@@ -194,7 +194,7 @@ for skill_name in "${changed_skills[@]}"; do
                     changed_files="$changed_files,"
                 fi
                 changed_files="$changed_files\"$file_path\""
-                ((file_count++))
+                ((file_count++)) || true
             fi
          fi
      done < "$CHANGES_FILE"
