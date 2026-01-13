@@ -52,25 +52,25 @@ Refer to that document for:
 
 ## Release Workflow
 
-### Automated Version Checking (Pre-Commit Hook)
+### Automated Version Checking (Pre-Push Hook)
 
-**RECOMMENDED**: Install the pre-commit hook to automatically enforce version updates:
+**RECOMMENDED**: Install the pre-push hook to automatically enforce version updates:
 
 ```bash
-# For Git repositories
-ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-commit .git/hooks/pre-commit
-
-# For Jujutsu repositories
-# Add to .jj/repo/config.toml:
-# [hooks]
-# pre-commit = ".claude/skills/verify-release-readiness/hooks/pre-commit"
+# For both Git and Jujutsu repositories
+ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-push .git/hooks/pre-push
 ```
 
 Once installed, the hook will:
-- ✅ Automatically detect skill changes before each commit
-- ✅ Block commits if skill versions haven't been updated
+- ✅ Automatically detect skill changes before each push
+- ✅ Block pushes if skill versions haven't been updated
 - ✅ Provide clear instructions on which versions need updating
-- ✅ Ensure you never forget to update versions
+- ✅ Works for both Git (`git push`) and Jujutsu (`jj git push`) users
+- ✅ Ensures you never publish skills with incorrect versions
+
+**Why pre-push?** Unlike pre-commit hooks, pre-push works automatically for both Git and Jujutsu with a single installation. Jujutsu users run `jj git push`, which triggers Git's pre-push hook automatically.
+
+**Alternative:** A pre-commit hook is also available at `hooks/pre-commit` if you prefer earlier validation (but requires separate Jujutsu configuration).
 
 ### Manual Verification (Before Publishing)
 
@@ -84,4 +84,4 @@ Before publishing or committing skills or plugins to the marketplace, use the in
 
 The skill is located at `.claude/skills/verify-release-readiness/SKILL.md` and provides detailed step-by-step guidance.
 
-**Note**: If you've installed the pre-commit hook, steps 1-3 will be enforced automatically during commits.
+**Note**: If you've installed the pre-push hook, version checking will be enforced automatically during pushes.

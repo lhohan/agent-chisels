@@ -14,28 +14,28 @@ This skill automates the release preparation workflow and ensures all skills hav
 
 This skill can be used in two ways:
 
-1. **Automated (Recommended)**: Install the pre-commit hook to automatically enforce version updates on every commit
+1. **Automated (Recommended)**: Install the pre-push hook to automatically enforce version updates before publishing
 2. **Manual**: Invoke this skill manually before publishing to marketplace
 
-### Installing the Pre-Commit Hook
+### Installing the Pre-Push Hook
 
-**RECOMMENDED**: Install the pre-commit hook to make version checking deterministic:
+**RECOMMENDED**: Install the pre-push hook to make version checking deterministic:
 
 ```bash
-# For Git repositories
-ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-commit .git/hooks/pre-commit
-
-# For Jujutsu repositories
-# Add to .jj/repo/config.toml:
-# [hooks]
-# pre-commit = ".claude/skills/verify-release-readiness/hooks/pre-commit"
+# For both Git and Jujutsu repositories
+ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-push .git/hooks/pre-push
 ```
 
 Once installed:
-- ✅ Automatically runs before every commit
-- ✅ Blocks commits if skill versions aren't updated
+- ✅ Automatically runs before every push
+- ✅ Blocks pushes if skill versions aren't updated
 - ✅ Provides clear guidance on which versions need updating
-- ✅ Ensures you never forget to update versions
+- ✅ Works for both Git (`git push`) and Jujutsu (`jj git push`)
+- ✅ Ensures you never publish skills with incorrect versions
+
+**Why pre-push?** It works automatically for both Git and Jujutsu with a single installation. Jujutsu users run `jj git push`, which triggers Git's pre-push hook automatically.
+
+**Alternative:** A pre-commit hook is also available at `hooks/pre-commit` if you prefer earlier validation (but requires separate Jujutsu configuration).
 
 The hook uses the same detection script as this skill, so behavior is consistent.
 
@@ -50,10 +50,10 @@ The hook uses the same detection script as this skill, so behavior is consistent
 ## Prerequisites
 
 Before using this skill:
-- You are in a Jujutsu repository with a `main` bookmark and `main@origin` (remote tracking bookmark)
+- You are in a Git or Jujutsu repository with a `main` branch/bookmark and `origin/main` or `main@origin`
 - `jq` is installed (for JSON parsing)
 - You have the `scripts/verify-skills-static.sh` and `scripts/verify-skills-opencode.sh` scripts available
-- **(For automated mode)**: Pre-commit hook installed (see above)
+- **(For automated mode)**: Pre-push hook installed (see above)
 
 ## Release Preparation Workflow
 

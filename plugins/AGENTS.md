@@ -60,24 +60,24 @@ Decisions should be updated so the decision log and implementation stay consiste
 
 **Policy**: Publishing a plugin is accomplished by pushing to the remote repository (e.g., GitHub).
 
-### Setup: Install Pre-Commit Hook (Recommended)
+### Setup: Install Pre-Push Hook (Recommended)
 
-**IMPORTANT**: Before developing skills, install the pre-commit hook to automatically enforce version updates:
+**IMPORTANT**: Before developing skills, install the pre-push hook to automatically enforce version updates:
 
 ```bash
-# For Git repositories
-ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-commit .git/hooks/pre-commit
-
-# For Jujutsu repositories
-# Add to .jj/repo/config.toml:
-# [hooks]
-# pre-commit = ".claude/skills/verify-release-readiness/hooks/pre-commit"
+# For both Git and Jujutsu repositories
+ln -sf ../../../../.claude/skills/verify-release-readiness/hooks/pre-push .git/hooks/pre-push
 ```
 
 This hook will:
-- Automatically detect when you modify skills
-- Block commits if you forget to update version numbers
+- Automatically detect when you modify skills before push
+- Block pushes if you forget to update version numbers
 - Guide you on which versions need updating
+- Works for both Git (`git push`) and Jujutsu (`jj git push`)
+
+**Why pre-push?** It works automatically for both Git and Jujutsu with a single installation. Jujutsu users run `jj git push`, which triggers Git's pre-push hook automatically.
+
+**Alternative:** A pre-commit hook is also available at `hooks/pre-commit` if you prefer earlier validation (but requires separate Jujutsu configuration).
 
 ### Publishing Steps
 
@@ -97,14 +97,15 @@ This hook will:
       - `plugins/[plugin-name]/.claude-plugin/plugin.json`
       - `.claude-plugin/marketplace.json` (at root)
     - **CRITICAL**: Update version in `skills/[skill-name]/SKILL.md` frontmatter if skill changed
-      - The pre-commit hook will enforce this if installed
+      - The pre-push hook will enforce this if installed
 
 4. **Commit changes**:
-   - If pre-commit hook is installed, it will verify version updates
-   - Update any flagged skill versions before committing
+   - Commit your work with clear commit messages
 
 5. **Tag the release**:
 6. **Push to remote**:
+   - If pre-push hook is installed, it will verify version updates before pushing
+   - Update any flagged skill versions and commit before retrying the push
 
 ### Marketplace Distribution
 
