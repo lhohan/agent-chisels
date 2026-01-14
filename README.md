@@ -1,7 +1,7 @@
 # Agent Chisels
 
 > [!NOTE]
-> This repository is part of my personal public learning journey. I'm building and experimenting with reusable AI skills, commands, and agents in the open. Expect ongoing evolution, experimentation, and refinement as I learn.
+> This repository is part of my personal public learning journey. I'm building and experimenting with reusable AI skills, commands, and agents in the open. Expect ongoing evolution, experimentation, and refinement as I learn. Also, because it is public, I hope to bring some more structure to my own work in this crazy-fast evolving domain.
 
 Reusable skills, commands, and agents for AI-assisted development.
 
