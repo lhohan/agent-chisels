@@ -33,7 +33,7 @@ Use `UserPromptSubmit` with a matcher that only fires on VCS-related prompts:
   "hooks": {
     "UserPromptSubmit": [
       {
-        "matcher": "commit|push|pull|branch|status|log|diff|merge|rebase|checkout|stash|bookmark|jj|history",
+        "matcher": "commit|push|pull|branch|status|log|diff|merge|rebase|checkout|stash|bookmark|jj|history|git",
         "hooks": [
           {
             "type": "command",
