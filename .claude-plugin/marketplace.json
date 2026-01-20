@@ -12,7 +12,7 @@
     {
       "name": "agent-tools",
       "source": "./plugins/agent-tools",
-      "description": "Core tools and skills for AI agents. Includes evaluating-skills, ...",
+      "description": "Core tools and skills for AI agents. Includes evaluate-skills, ...",
       "category": "agent-tools",
       "keywords": ["skills", "evaluation", "quality-assurance"],
       "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/agent-tools",
@@ -30,13 +30,13 @@
       "license": "MIT"
     },
     {
-      "name": "documenting-architectural-decisions",
-      "source": "./plugins/documenting-architectural-decisions",
+      "name": "document-architectural-decisions",
+      "source": "./plugins/document-architectural-decisions",
       "description": "Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats.",
       "category": "documentation",
       "keywords": ["adr", "architecture", "decisions", "documentation"],
-      "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/documenting-architectural-decisions",
-      "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/documenting-architectural-decisions",
+      "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/document-architectural-decisions",
+      "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/document-architectural-decisions",
       "license": "MIT"
     }
   ]

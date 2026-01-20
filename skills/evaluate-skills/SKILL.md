@@ -1,5 +1,5 @@
 ---
-name: evaluating-skills
+name: evaluate-skills
 description: Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
 version: "1.0.0"
 ---
@@ -168,7 +168,7 @@ Evaluate the skill across **10 dimensions**:
 - ❌ Multiple conflicting approaches for same task
 - ❌ MCP tool references without server prefix (should use `ServerName:tool_name` format)
 - ❌ Assumed package availability (missing explicit installation instructions)
-- ❌ Vague/generic naming (`helper`, `utils`, `tools` instead of gerund form like `processing-pdfs`)
+- ❌ Vague/generic naming (`helper`, `utils`, `tools` instead of imperative verb form like `process-pdfs`)
 
 **Assessment:**
 - Count violations
@@ -233,7 +233,7 @@ Create a detailed evaluation report with these components:
 8. **Report Metadata** (optional footer):
    - Evaluation date (YYYY-MM-DD format)
    - Skill path evaluated
-   - Evaluator skill version (if tracking multiple versions of evaluating-skills itself)
+   - Evaluator skill version (if tracking multiple versions of evaluate-skills itself)
 
 ### 5. Deliver Report to User
 

@@ -68,7 +68,7 @@ This separation:
 **Files:**
 - `plugins/jj/hooks/hooks.json` - Hook configuration
 - `plugins/jj/hooks-handlers/jj-reminder.sh` - Handler script
-- `skills/detecting-jujutsu/scripts/detect-jj.sh` - Detection logic
+- `skills/detect-jujutsu/scripts/detect-jj.sh` - Detection logic
 
 **Flow:**
 1. SessionStart triggers `jj-reminder.sh`
@@ -107,7 +107,7 @@ export const JJVCSPlugin: Plugin = async (ctx) => {
   // Get path to shared detection script in skills/
   const __dirname = dirname(fileURLToPath(import.meta.url))
   const repoRoot = resolve(__dirname, "../../..")
-  const detectScript = resolve(repoRoot, "skills/detecting-jujutsu/scripts/detect-jj.sh")
+  const detectScript = resolve(repoRoot, "skills/detect-jujutsu/scripts/detect-jj.sh")
 
   // Detection function (reuses existing shell script)
   async function detectJJ(): Promise<boolean> {
@@ -124,8 +124,8 @@ export const JJVCSPlugin: Plugin = async (ctx) => {
 Always use \`jj\` commands for version control operations in this repository.
 
 **Guidance**:
-- If uncertain about VCS state, invoke the \`detecting-jujutsu\` skill
-- For detailed instructions, invoke the \`using-jujutsu\` skill
+- If uncertain about VCS state, invoke the \`detect-jujutsu\` skill
+- For detailed instructions, invoke the \`use-jujutsu\` skill
 - Use \`/use-jj\` to re-inject this reminder
 
 State the version control system you will use for this session.`
@@ -205,7 +205,7 @@ opencode-plugins/
 SCRIPT_DIR="$(dirname "$0")"
 OUTPUT_FILE="${SCRIPT_DIR}/../../.opencode-jj-context.md"
 
-if bash "${SCRIPT_DIR}/../../../skills/detecting-jujutsu/scripts/detect-jj.sh" --quiet; then
+if bash "${SCRIPT_DIR}/../../../skills/detect-jujutsu/scripts/detect-jj.sh" --quiet; then
   cat > "$OUTPUT_FILE" << 'EOF'
 # Jujutsu VCS Context
 
@@ -214,8 +214,8 @@ if bash "${SCRIPT_DIR}/../../../skills/detecting-jujutsu/scripts/detect-jj.sh" -
 Always use `jj` commands for version control operations.
 
 **Guidance**:
-- If uncertain about VCS state, invoke the `detecting-jujutsu` skill
-- For detailed instructions, invoke the `using-jujutsu` skill
+- If uncertain about VCS state, invoke the `detect-jujutsu` skill
+- For detailed instructions, invoke the `use-jujutsu` skill
 EOF
 else
   # Empty file when not jj repo

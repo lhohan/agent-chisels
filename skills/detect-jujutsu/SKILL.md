@@ -1,5 +1,5 @@
 ---
-name: detecting-jujutsu
+name: detect-jujutsu
 description: Verify if the current repository uses Jujutsu (jj) instead of git. Use this skill when you or the user needs to confirm the version control system (VCS) state before performing operations.
 version: 0.2.1
 ---
@@ -13,7 +13,7 @@ This repository uses **Jujutsu (jj)** as its version control if confirmed by the
 To verify if this is a Jujutsu repository, you **MUST** run the following script using the Bash tool:
 
 ```bash
-bash skills/detecting-jujutsu/scripts/detect-jj.sh
+bash skills/detect-jujutsu/scripts/detect-jj.sh
 ```
 
 This works from the repository root directory.
@@ -22,7 +22,7 @@ This works from the repository root directory.
 
 - **Exit Code 0 (Success)**: This is a Jujutsu repository.
   - **Action**: Use `jj` commands exclusively.
-  - **Next Step**: **Invoke the `using-jujutsu` skill** for detailed command reference and workflows.
+  - **Next Step**: **Invoke the `use-jujutsu` skill** for detailed command reference and workflows.
 - **Exit Code 1 (Not JJ)**: This is a standard Git repository.
   - **Action**: Use standard `git` workflows.
 - **Exit Code 2 (Indeterminate)**: An error occurred (e.g., `jj` not installed or not in a git repo).

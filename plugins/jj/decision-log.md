@@ -21,7 +21,7 @@ See `../../docs/backlog/jj-userpromptsubmit-hooks.md` for research on UserPrompt
 
 > **In the context of** balancing startup speed with VCS reliability,
 > **facing** the risk of the model ignoring passive context in long sessions,
-> **we decided** to use "strong language" in the hook and `/use-jj` command that explicitly instructs the model to consult the `detecting-jujutsu` or `using-jujutsu` skills *before* executing any command,
+> **we decided** to use "strong language" in the hook and `/use-jj` command that explicitly instructs the model to consult the `detect-jujutsu` or `use-jujutsu` skills *before* executing any command,
 > **to achieve** high compliance without the 5-second latency cost of a forced skill-invocation loop at startup,
 > **accepting** that the model still maintains a small chance of "forgetting" which is mitigated by the manual `/use-jj` fallback and the top-of-context placement.
 
@@ -29,7 +29,7 @@ See `../../docs/backlog/jj-userpromptsubmit-hooks.md` for research on UserPrompt
 
 > **In the context of** providing layered support for Jujutsu (jj) in Claude Code,
 > **facing** the potential for model confusion when combining detection logic and deep guidance into a single skill,
-> **we decided** to split the capability into two distinct skills: `detecting-jujutsu` (for repository verification) and `using-jujutsu` (for detailed guidance),
+> **we decided** to split the capability into two distinct skills: `detect-jujutsu` (for repository verification) and `use-jujutsu` (for detailed guidance),
 > **to achieve** a clearer separation of concerns and more precise skill triggering based on the model's current need (verification vs. execution),
 > **accepting** the added complexity of managing two skill files within the same plugin.
 

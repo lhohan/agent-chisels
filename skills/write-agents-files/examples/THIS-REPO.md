@@ -49,7 +49,7 @@ Commands to run tests:
 Tools and servers the agent can use:
 
 - **CLI tools**
-  - Skill evaluation: Use `/evaluating-skills` on new/modified skills
+  - Skill evaluation: Use `/evaluate-skills` on new/modified skills
   - Version check: Run `verify-release-readiness` skill
   - Validation scripts: Check that skills pass structure validation
 
@@ -73,7 +73,7 @@ All skills must pass evaluation before publishing.
 - Added: 2025-01-08 (Plugin versioning policy)
 
 ### Skill Naming
-- Use gerund form (processing-pdfs, not pdf-processor)
+- Use imperative form (process-pdfs, not processing-pdfs or pdf-processor)
 - Kebab-case for directories and names
 - SKILL.md must be uppercase
 - Added: 2025-01-05 (Naming conventions)
@@ -82,7 +82,7 @@ All skills must pass evaluation before publishing.
 - Target 200 characters for descriptions
 - Maximum 1024 characters (hard limit)
 - Include WHAT and WHEN TO USE
-- Added: 2025-01-15 (evaluating-skills feedback)
+- Added: 2025-01-15 (evaluate-skills feedback)
 
 ## Guidelines
 
@@ -97,7 +97,7 @@ For detailed guidelines, see:
 ## Why This Works
 
 - Under 100 lines ✓
-- Specific verification tools for this repo (evaluating-skills, verify-release-readiness) ✓
+- Specific verification tools for this repo (evaluate-skills, verify-release-readiness) ✓
 - Real gotchas from actual development (symlinks, versioning, naming) ✓
 - Points to specialized AGENTS.md files (plugins/AGENTS.md) ✓
 - Demonstrates self-application of the methodology
@@ -108,7 +108,7 @@ For detailed guidelines, see:
 This example demonstrates the skill's own principles:
 
 1. **Brevity**: ~70 lines, well under 100-line target
-2. **Agentic loops**: Lists concrete verification tools (evaluating-skills, verify-release-readiness)
+2. **Agentic loops**: Lists concrete verification tools (evaluate-skills, verify-release-readiness)
 3. **Living gotchas**: Real issues from actual development with dates and sources
 4. **Task-specific files**: References plugins/AGENTS.md for detailed plugin development
 

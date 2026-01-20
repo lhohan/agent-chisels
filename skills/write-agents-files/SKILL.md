@@ -1,5 +1,5 @@
 ---
-name: writing-agents-files
+name: write-agents-files
 description: Create and maintain effective AGENTS.md files following OpenAI best practices. Keep instructions brief, unlock agentic loops, document gotchas, and reference task-specific files. Use when setting up or improving agent instructions.
 version: "0.1.0"
 ---
@@ -339,6 +339,6 @@ See `examples/` directory for complete examples:
 
 ## See Also
 
-- `evaluating-skills`: Evaluate skills against best practices
+- `evaluate-skills`: Evaluate skills against best practices
 - `commit-message-generator`: Generate conventional commit messages
 - `verify-release-readiness`: Verify release readiness for skills and plugins

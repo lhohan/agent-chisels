@@ -28,7 +28,7 @@ At the root-level of repository:
 ### Naming Conventions
 
 - **Plugin names**: kebab-case (e.g., `agent-tools`, `jj`)
-- **Skill names**: kebab-case (e.g., `evaluating-skills`, `code-reviewer`)
+- **Skill names**: kebab-case (e.g., `evaluate-skills`, `code-reviewer`)
 - **Skill files**: `SKILL.md` (uppercase, required)
 
 ## Architecture
@@ -68,7 +68,7 @@ Decisions should be updated so the decision log and implementation stay consiste
    ```
 
 2. **Test thoroughly**: 
-   - Use the `evaluating-skills` skill for all skills
+   - Use the `evaluate-skills` skill for all skills
    - Test commands and agents as applicable
 
 3. **Update documentation**:
@@ -101,7 +101,7 @@ For details on this decision, see [decision-log.md](./decision-log.md).
 
 ## Key Principles
 
-1. **Quality First**: Use `evaluating-skills` before publishing
+1. **Quality First**: Use `evaluate-skills` before publishing
 2. **Clear Scope**: Each skill has one focused capability
 3. **User-Centric**: Write for discoverability and ease of use
 4. **Semantic Versioning**: Follow version conventions

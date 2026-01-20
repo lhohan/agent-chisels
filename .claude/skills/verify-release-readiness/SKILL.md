@@ -152,18 +152,18 @@ Ready to commit and release!
 {
   "changed_skills": [
     {
-      "name": "detecting-jujutsu",
+      "name": "detect-jujutsu",
       "current_version": "0.2.0",
       "main_version": "0.1.0",
       "needs_update": false,
-      "changed_files": ["skills/detecting-jujutsu/SKILL.md"]
+      "changed_files": ["skills/detect-jujutsu/SKILL.md"]
     },
     {
-      "name": "using-jujutsu",
+      "name": "use-jujutsu",
       "current_version": "0.2.0",
       "main_version": "0.2.0",
       "needs_update": true,
-      "changed_files": ["skills/using-jujutsu/SKILL.md", "skills/using-jujutsu/scripts/detect.sh"]
+      "changed_files": ["skills/use-jujutsu/SKILL.md", "skills/use-jujutsu/scripts/detect.sh"]
     }
   ]
 }

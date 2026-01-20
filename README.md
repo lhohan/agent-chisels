@@ -11,14 +11,14 @@ Reusable skills, commands, and agents for AI-assisted development.
 ## Available Skills
 
 ### Architecture
-- [documenting-architectural-decisions](./skills/documenting-architectural-decisions/SKILL.md) — Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
+- [document-architectural-decisions](./skills/document-architectural-decisions/SKILL.md) — Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
 
 ### Version Control
-- [detecting-jujutsu](./skills/detecting-jujutsu/SKILL.md) — Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
-- [using-jujutsu](./skills/using-jujutsu/SKILL.md) — Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and working with revisions/revsets.
+- [detect-jujutsu](./skills/detect-jujutsu/SKILL.md) — Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
+- [use-jujutsu](./skills/use-jujutsu/SKILL.md) — Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and working with revisions/revsets.
 
 ### Agentic Quality Assurance
-- [evaluating-skills](./skills/evaluating-skills/SKILL.md) — Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
+- [evaluate-skills](./skills/evaluate-skills/SKILL.md) — Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
 
 
 ## Installation

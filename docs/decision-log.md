@@ -2,6 +2,24 @@
 
 Decisions are listed in reverse chronological order (most recent first).
 
+### AC-003: Use imperative form for skill names [Status: Implemented]
+
+> **In the context of** skills moving closer to or becoming commands,
+> **facing** a mix of gerund form (`evaluating-skills`) and potential inconsistency with the documented anti-pattern guidance that recommends "imperative verb form like `process-pdfs`",
+> **we decided** to rename all skills from gerund form to imperative form,
+> **to achieve** consistency with the documented best practices and clear, action-oriented skill names,
+> **accepting** that existing documentation and historical references may still use old names and will need updates over time.
+
+| Old Name | New Name |
+|----------|----------|
+| `detecting-jujutsu` | `detect-jujutsu` |
+| `using-jujutsu` | `use-jujutsu` |
+| `evaluating-skills` | `evaluate-skills` |
+| `writing-agents-files` | `write-agents-files` |
+| `documenting-architectural-decisions` | `document-architectural-decisions` |
+
+See [skills/AGENTS.md](./skills/AGENTS.md) for updated naming conventions.
+
 ### AC-002: Use `.claude/skills/` at project level for skill discovery and dog-fooding across different AI agents [Status: Implemented]
 
 > **In the context of** AI coding agents needing to discover available skills within a project,

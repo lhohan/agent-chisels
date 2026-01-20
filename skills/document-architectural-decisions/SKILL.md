@@ -1,5 +1,5 @@
 ---
-name: documenting-architectural-decisions
+name: document-architectural-decisions
 description: Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
 version: 0.2.0
 ---
