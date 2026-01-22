@@ -13,6 +13,9 @@ Reusable skills, commands, and agents for AI-assisted development.
 ### Architecture
 - [document-architectural-decisions](./skills/document-architectural-decisions/SKILL.md) — Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
 
+### Testing
+- [design-test-dsl](./skills/design-test-dsl/SKILL.md) — **(Experimental/Unstable)** Design fluent, behaviour-driven test DSLs (Given/When/Then) for acceptance and unit tests against stable interfaces, with Rust-oriented examples.
+
 ### Version Control
 - [detect-jujutsu](./skills/detect-jujutsu/SKILL.md) — Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
 - [use-jujutsu](./skills/use-jujutsu/SKILL.md) — Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and working with revisions/revsets.

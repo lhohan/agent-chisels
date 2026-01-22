@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "Hans L'Hoest (hanlho)'s Claude Code plugins",
-    "version": "1.0.1"
+    "version": "1.1.0"
   },
   "plugins": [
     {
@@ -37,6 +37,16 @@
       "keywords": ["adr", "architecture", "decisions", "documentation"],
       "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/document-architectural-decisions",
       "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/document-architectural-decisions",
+      "license": "MIT"
+    },
+    {
+      "name": "design-test-dsl",
+      "source": "./plugins/design-test-dsl",
+      "description": "Experimental skill for designing fluent Given/When/Then test DSLs for behavioural testing at stable interfaces (acceptance + unit tests), with Rust-oriented examples.",
+      "category": "testing",
+      "keywords": ["testing", "bdd", "dsl", "acceptance-tests", "tdd", "qa", "qc", "quality-assurance", "quality-control", "given-when-then"],
+      "homepage": "https://github.com/lhohan/agent-chisels/tree/main/plugins/design-test-dsl",
+      "repository": "https://github.com/lhohan/agent-chisels/tree/main/plugins/design-test-dsl",
       "license": "MIT"
     }
   ]
