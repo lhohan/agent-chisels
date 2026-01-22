@@ -1,0 +1,585 @@
+#!/usr/bin/env bash
+#
+# llm-usage - Report LLM usage statistics from OpenCode and Claude Code
+#
+# Usage:
+#   llm-usage                    # Report for current project
+#   llm-usage --all              # Report for all projects
+#   llm-usage --project PATH     # Report for specific project
+#   llm-usage --from YYYY-MM-DD  # Filter from date
+#   llm-usage --to YYYY-MM-DD    # Filter to date
+#
+# Environment overrides (for testing):
+#   LLM_USAGE_OPENCODE_STORAGE   # OpenCode storage directory
+#   LLM_USAGE_CLAUDE_PROJECTS    # Claude Code projects directory
+#
+
+set -euo pipefail
+
+# --- Configuration ---
+readonly VERSION="0.1.0"
+readonly OPENCODE_STORAGE="${LLM_USAGE_OPENCODE_STORAGE:-$HOME/.local/share/opencode/storage}"
+readonly CLAUDE_PROJECTS="${LLM_USAGE_CLAUDE_PROJECTS:-$HOME/.claude/projects}"
+
+# --- CLI Parsing ---
+PROJECT_PATH=""
+FROM_DATE=""
+TO_DATE=""
+ALL_PROJECTS=false
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --all)
+            ALL_PROJECTS=true
+            shift
+            ;;
+        --project)
+            PROJECT_PATH="$2"
+            shift 2
+            ;;
+        --from)
+            FROM_DATE="$2"
+            shift 2
+            ;;
+        --to)
+            TO_DATE="$2"
+            shift 2
+            ;;
+        --help|--version)
+            echo "llm-usage v$VERSION"
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            exit 1
+            ;;
+    esac
+done
+
+# --- Helper Functions ---
+
+die() {
+    echo "Error: $1" >&2
+    exit 1
+}
+
+# Check if jq is available
+check_jq() {
+    if [[ "${LLM_USAGE_FORCE_NO_JQ:-}" == "1" ]]; then
+        die "jq is required but not installed. Install with: brew install jq (macOS) or apt install jq (Linux)"
+    fi
+    if ! command -v jq &> /dev/null; then
+        die "jq is required but not installed. Install with: brew install jq (macOS) or apt install jq (Linux)"
+    fi
+}
+
+# URL encode a path for Claude Code directory lookup
+url_encode() {
+    local result="${1#/}"  # Remove leading slash
+    result="${result//\//-}"  # Replace / with -
+    echo "-${result}"
+}
+
+# Convert milliseconds timestamp to YYYY-MM-DD
+ms_to_date() {
+    local ms="$1"
+    date -u -d "@$((ms / 1000))" +"%Y-%m-%d" 2>/dev/null || \
+    date -u -r "$((ms / 1000))" +"%Y-%m-%d" 2>/dev/null || \
+    echo "1970-01-01"
+}
+
+# --- OpenCode Data Loading ---
+
+# Load OpenCode stats for a single project
+load_opencode_stats() {
+    local project_path="$1"
+    local from="${FROM_DATE:-}"
+    local to="${TO_DATE:-}"
+
+    # Find project ID by worktree
+    local project_id=""
+    # Canonicalize project_path to handle symlinks (e.g., /var -> /private/var on macOS)
+    local canonical_project_path
+    canonical_project_path=$(cd "$project_path" 2>/dev/null && pwd -P || echo "$project_path")
+
+    if [[ -d "$OPENCODE_STORAGE/project" ]]; then
+        for pf in "$OPENCODE_STORAGE"/project/*.json; do
+            if [[ -f "$pf" ]]; then
+                local wt
+                wt=$(jq -r '.worktree' "$pf" 2>/dev/null || echo "")
+                # Canonicalize worktree path
+                local canonical_wt
+                canonical_wt=$(cd "$wt" 2>/dev/null && pwd -P || echo "$wt")
+                if [[ "$canonical_wt" == "$canonical_project_path" ]]; then
+                    project_id=$(jq -r '.id' "$pf")
+                    break
+                fi
+            fi
+        done
+    fi
+
+    if [[ -z "$project_id" ]]; then
+        echo '{"found": false, "sessions": 0, "sessions_by_model": {}, "messages": 0, "messages_by_model": {}, "tokens": null, "usage_by_date": {}}'
+        return
+    fi
+
+    # Count sessions
+    local sessions_dir="$OPENCODE_STORAGE/session/$project_id"
+    local sessions=0
+
+    if [[ -d "$sessions_dir" ]]; then
+        sessions=$(find "$sessions_dir" -name "ses_*.json" 2>/dev/null | wc -l | tr -d ' ')
+    fi
+
+    # Build sessions_by_model from messages (count session once per model)
+    local sessions_by_model='{}'
+
+    # Count messages using jq glob pattern
+    local messages_dir="$OPENCODE_STORAGE/message"
+    local messages=0
+    local messages_by_model='{}'
+    local usage_by_date='{}'
+    local tokens='null'
+
+    # Only process messages for the specific project's sessions
+    if [[ -d "$messages_dir" ]] && [[ -d "$sessions_dir" ]]; then
+        # Get list of session IDs for this project
+        local session_ids
+        session_ids=$(find "$sessions_dir" -name "ses_*.json" -exec basename {} \; 2>/dev/null | sed 's/.json$//' || echo "")
+
+        if [[ -n "$session_ids" ]]; then
+            # Sessions by model
+            for session_id in $session_ids; do
+                if [[ -d "$messages_dir/$session_id" ]]; then
+                    local models
+                    models=$(find "$messages_dir/$session_id" -name "*.json" -exec cat {} \; 2>/dev/null | jq -r '.modelID // empty' | sort -u || echo "")
+                    for model in $models; do
+                        local current
+                        current=$(echo "$sessions_by_model" | jq -r ".\"$model\" // 0")
+                        sessions_by_model=$(echo "$sessions_by_model" | jq ".\"$model\" = $((current + 1))" 2>/dev/null || echo "{}")
+                    done
+                fi
+            done
+
+            # Process messages for each session
+            local all_messages='[]'
+            for session_id in $session_ids; do
+                local session_messages
+                if [[ -d "$messages_dir/$session_id" ]]; then
+                    session_messages=$(find "$messages_dir/$session_id" -name "*.json" -exec cat {} \; 2>/dev/null | jq -s '.' || echo "[]")
+                    all_messages=$(echo "$all_messages $session_messages" | jq -s 'add' 2>/dev/null || echo "$all_messages")
+                fi
+            done
+
+            # Filter and aggregate - OpenCode has modelID at top level
+            if [[ -n "$from" ]] || [[ -n "$to" ]]; then
+                all_messages=$(echo "$all_messages" | jq --arg from "$from" --arg to "$to" \
+                    '[.[] | select(.time.created > 0) | {date: (.time.created / 1000 | strftime("%Y-%m-%d")), model: (.modelID // empty), input: (.tokens.input // 0), output: (.tokens.output // 0), msg: 1}] |
+                    map(select(.date >= $from and .date <= $to))' 2>/dev/null || echo '[]')
+            else
+                all_messages=$(echo "$all_messages" | jq '[.[] | select(.time.created > 0) | {date: (.time.created / 1000 | strftime("%Y-%m-%d")), model: (.modelID // empty), input: (.tokens.input // 0), output: (.tokens.output // 0), msg: 1}]' 2>/dev/null || echo '[]')
+            fi
+
+            # Count messages
+            messages=$(echo "$all_messages" | jq 'length' 2>/dev/null || echo 0)
+
+            # Messages by model
+            messages_by_model=$(echo "$all_messages" | jq 'map(select(.model != "")) | group_by(.model) | map({key: .[0].model, value: length}) | from_entries' 2>/dev/null || echo '{}')
+
+            # Usage by date
+            usage_by_date=$(echo "$all_messages" | jq 'group_by(.date) | map({key: .[0].date, value: {sessions: (group_by(.model) | length), messages: length}}) | from_entries' 2>/dev/null || echo '{}')
+
+            # Tokens for OpenCode
+            tokens=$(echo "$all_messages" | jq 'map(select(.model != "")) | group_by(.model) | map({key: .[0].model, value: {input: map(.input | tonumber) | add, output: map(.output | tonumber) | add}}) | from_entries' 2>/dev/null || echo '{}')
+        fi
+    fi
+
+    jq -n \
+        --argjson found true \
+        --argjson sessions "$sessions" \
+        --argjson sessions_by_model "$sessions_by_model" \
+        --argjson messages "$messages" \
+        --argjson messages_by_model "$messages_by_model" \
+        --argjson tokens "$tokens" \
+        --argjson usage_by_date "$usage_by_date" \
+        '{
+            found: $found,
+            sessions: $sessions,
+            sessions_by_model: $sessions_by_model,
+            messages: $messages,
+            messages_by_model: $messages_by_model,
+            tokens: $tokens,
+            usage_by_date: $usage_by_date
+        }'
+}
+
+# Load OpenCode stats across all projects
+load_opencode_all() {
+    local from="${FROM_DATE:-}"
+    local to="${TO_DATE:-}"
+
+    if [[ ! -d "$OPENCODE_STORAGE/project" ]] || [[ -z "$(ls -A "$OPENCODE_STORAGE"/project/*.json 2>/dev/null)" ]]; then
+        echo '{"found": false, "sessions": 0, "sessions_by_model": {}, "messages": 0, "messages_by_model": {}, "tokens": null, "usage_by_date": {}}'
+        return
+    fi
+
+    local sessions=0
+    if [[ -d "$OPENCODE_STORAGE/session" ]]; then
+        sessions=$(find "$OPENCODE_STORAGE/session" -name "ses_*.json" 2>/dev/null | wc -l | tr -d ' ')
+    fi
+
+    local messages_dir="$OPENCODE_STORAGE/message"
+    local messages=0
+    local messages_by_model='{}'
+    local usage_by_date='{}'
+    local tokens='null'
+    local sessions_by_model='{}'
+
+    if [[ -d "$messages_dir" ]] && [[ -n "$(find "$messages_dir" -path "*/ses_*/msg_*.json" -print -quit 2>/dev/null)" ]]; then
+        local all_messages
+        all_messages=$(find "$messages_dir" -path "*/ses_*/msg_*.json" -exec cat {} \; 2>/dev/null | jq -s '.')
+
+        if [[ -n "$from" ]] || [[ -n "$to" ]]; then
+            all_messages=$(echo "$all_messages" | jq --arg from "$from" --arg to "$to" \
+                '[.[] | select(.time.created > 0) | {date: (.time.created / 1000 | strftime("%Y-%m-%d")), model: (.modelID // empty), input: (.tokens.input // 0), output: (.tokens.output // 0), session: (.sessionID // empty)}] |
+                map(select(.date >= $from and .date <= $to))' 2>/dev/null || echo '[]')
+        else
+            all_messages=$(echo "$all_messages" | jq '[.[] | select(.time.created > 0) | {date: (.time.created / 1000 | strftime("%Y-%m-%d")), model: (.modelID // empty), input: (.tokens.input // 0), output: (.tokens.output // 0), session: (.sessionID // empty)}]' 2>/dev/null || echo '[]')
+        fi
+
+        messages=$(echo "$all_messages" | jq 'length' 2>/dev/null || echo 0)
+        messages_by_model=$(echo "$all_messages" | jq 'map(select(.model != "")) | group_by(.model) | map({key: .[0].model, value: length}) | from_entries' 2>/dev/null || echo '{}')
+        usage_by_date=$(echo "$all_messages" | jq 'group_by(.date) | map({key: .[0].date, value: {sessions: (map(.session) | unique | length), messages: length}}) | from_entries' 2>/dev/null || echo '{}')
+        tokens=$(echo "$all_messages" | jq 'map(select(.model != "")) | group_by(.model) | map({key: .[0].model, value: {input: map(.input | tonumber) | add, output: map(.output | tonumber) | add}}) | from_entries' 2>/dev/null || echo '{}')
+        sessions_by_model=$(echo "$all_messages" | jq 'map(select(.model != "" and .session != "")) | map({model, session}) | unique | group_by(.model) | map({key: .[0].model, value: length}) | from_entries' 2>/dev/null || echo '{}')
+    fi
+
+    jq -n \
+        --argjson found true \
+        --argjson sessions "$sessions" \
+        --argjson sessions_by_model "$sessions_by_model" \
+        --argjson messages "$messages" \
+        --argjson messages_by_model "$messages_by_model" \
+        --argjson tokens "$tokens" \
+        --argjson usage_by_date "$usage_by_date" \
+        '{
+            found: $found,
+            sessions: $sessions,
+            sessions_by_model: $sessions_by_model,
+            messages: $messages,
+            messages_by_model: $messages_by_model,
+            tokens: $tokens,
+            usage_by_date: $usage_by_date
+        }'
+}
+
+# --- Claude Code Data Loading ---
+
+# Load Claude Code stats for a single project
+load_claude_stats() {
+    local project_path="$1"
+    local from="${FROM_DATE:-}"
+    local to="${TO_DATE:-}"
+
+    # Canonicalize project_path to handle symlinks (e.g., /var -> /private/var on macOS)
+    local canonical_project_path
+    canonical_project_path=$(cd "$project_path" 2>/dev/null && pwd -P || echo "$project_path")
+
+    local encoded_dir project_dir
+
+    # Try canonical path first
+    encoded_dir=$(url_encode "$canonical_project_path")
+    project_dir="$CLAUDE_PROJECTS/$encoded_dir"
+
+    # If not found with canonical path, try with original path
+    if [[ ! -d "$project_dir" ]]; then
+        encoded_dir=$(url_encode "$project_path")
+        project_dir="$CLAUDE_PROJECTS/$encoded_dir"
+    fi
+
+    # If still not found, try to find any matching directory by checking all directories
+    if [[ ! -d "$project_dir" ]] && [[ -d "$CLAUDE_PROJECTS" ]]; then
+        # Also try non-canonical version (e.g., /var instead of /private/var on macOS)
+        local non_canonical_path="${canonical_project_path#/private}"
+        
+        for dir in "$CLAUDE_PROJECTS"/*; do
+            if [[ -d "$dir" ]]; then
+                # Check if this directory has any .jsonl files
+                for jsonl in "$dir"/*.jsonl; do
+                    if [[ -f "$jsonl" ]]; then
+                        # Check if any entry in the JSONL has a cwd that matches our path
+                        if grep -q "\"cwd\":\"$canonical_project_path\"" "$jsonl" 2>/dev/null || \
+                           grep -q "\"cwd\":\"$project_path\"" "$jsonl" 2>/dev/null || \
+                           grep -q "\"cwd\":\"$non_canonical_path\"" "$jsonl" 2>/dev/null; then
+                            project_dir="$dir"
+                            break 2
+                        fi
+                    fi
+                done
+            fi
+        done
+    fi
+
+    if [[ ! -d "$project_dir" ]]; then
+        echo '{"found": false, "sessions": 0, "sessions_by_model": {}, "messages": 0, "messages_by_model": {}, "tokens": {}, "usage_by_date": {}}'
+        return
+    fi
+
+    local sessions=0
+    local sessions_by_model='{}'
+    local all_entries_combined='[]'
+
+    # Collect all entries from all sessions
+    for session_file in "$project_dir"/*.jsonl; do
+        if [[ -f "$session_file" ]]; then
+            ((sessions++))
+
+            # Process all entries from this session
+            local session_entries
+            session_entries=$(jq -s 'map(select(has("message") and .message.usage != null and (.message.usage | type == "object"))) | map({model: .message.model, timestamp: .timestamp, input: .message.usage.input_tokens, output: .message.usage.output_tokens})' "$session_file" 2>/dev/null || echo "[]")
+
+            if [[ "$(echo "$session_entries" | jq 'length')" -gt 0 ]]; then
+                # Get unique models for this session
+                local models
+                models=$(echo "$session_entries" | jq -r '.[].model' | sort -u || echo "")
+                for model in $models; do
+                    local current
+                    current=$(echo "$sessions_by_model" | jq -r ".\"$model\" // 0")
+                    sessions_by_model=$(echo "$sessions_by_model" | jq ".\"$model\" = $((current + 1))" 2>/dev/null || echo "{}")
+                done
+
+                # Combine with all entries
+                all_entries_combined=$(echo "$all_entries_combined $session_entries" | jq -s 'add' 2>/dev/null || echo "$all_entries_combined")
+            fi
+        fi
+    done
+
+    # Apply date filters if needed
+    if [[ -n "$from" ]] || [[ -n "$to" ]]; then
+        all_entries_combined=$(echo "$all_entries_combined" | jq --arg from "$from" --arg to "$to" \
+            'map(select(.timestamp[0:10] >= $from and .timestamp[0:10] <= $to))' 2>/dev/null || echo "[]")
+    fi
+
+    # Aggregate across all sessions
+    local messages
+    messages=$(echo "$all_entries_combined" | jq 'length' 2>/dev/null || echo 0)
+
+    local messages_by_model
+    messages_by_model=$(echo "$all_entries_combined" | jq 'group_by(.model) | map({key: .[0].model, value: length}) | from_entries' 2>/dev/null || echo '{}')
+
+    local tokens_input tokens_output
+    tokens_input=$(echo "$all_entries_combined" | jq 'group_by(.model) | map({key: .[0].model, value: map(.input | tonumber) | add}) | from_entries' 2>/dev/null || echo '{}')
+    tokens_output=$(echo "$all_entries_combined" | jq 'group_by(.model) | map({key: .[0].model, value: map(.output | tonumber) | add}) | from_entries' 2>/dev/null || echo '{}')
+
+    local usage_by_date
+    usage_by_date=$(echo "$all_entries_combined" | jq 'group_by(.timestamp[0:10]) | map({key: .[0].timestamp[0:10], value: {sessions: (map(.model) | unique | length), messages: length}}) | from_entries' 2>/dev/null || echo '{}')
+
+    # Build tokens object
+    local tokens='{}'
+    local all_models
+    all_models=$(echo "$tokens_input" | jq -r 'keys[]' 2>/dev/null || echo "")
+    for model in $all_models; do
+        local inp out
+        inp=$(echo "$tokens_input" | jq -r ".\"$model\" // 0")
+        out=$(echo "$tokens_output" | jq -r ".\"$model\" // 0")
+        tokens=$(echo "$tokens" | jq ".\"$model\" = {input: $inp, output: $out}" 2>/dev/null || echo "{}")
+    done
+
+    jq -n \
+        --argjson found true \
+        --argjson sessions "$sessions" \
+        --argjson sessions_by_model "$sessions_by_model" \
+        --argjson messages "$messages" \
+        --argjson messages_by_model "$messages_by_model" \
+        --argjson tokens "$tokens" \
+        --argjson usage_by_date "$usage_by_date" \
+        '{
+            found: $found,
+            sessions: $sessions,
+            sessions_by_model: $sessions_by_model,
+            messages: $messages,
+            messages_by_model: $messages_by_model,
+            tokens: $tokens,
+            usage_by_date: $usage_by_date
+        }'
+}
+
+# Load Claude Code stats across all projects
+load_claude_all() {
+    local from="${FROM_DATE:-}"
+    local to="${TO_DATE:-}"
+
+    if [[ ! -d "$CLAUDE_PROJECTS" ]] || [[ -z "$(ls -A "$CLAUDE_PROJECTS"/*/*.jsonl 2>/dev/null)" ]]; then
+        echo '{"found": false, "sessions": 0, "sessions_by_model": {}, "messages": 0, "messages_by_model": {}, "tokens": {}, "usage_by_date": {}}'
+        return
+    fi
+
+    local sessions=0
+    local sessions_by_model='{}'
+    local messages=0
+    local messages_by_model='{}'
+    local tokens_input='{}'
+    local tokens_output='{}'
+    local usage_by_date='{}'
+    local all_entries='[]'
+
+    for session_file in "$CLAUDE_PROJECTS"/*/*.jsonl; do
+        if [[ -f "$session_file" ]]; then
+            ((sessions++))
+
+            local entries_json
+            entries_json=$(jq -s 'map(select(has("message") and .message.usage != null and (.message.usage | type == "object"))) | map({model: .message.model, timestamp: .timestamp, input: .message.usage.input_tokens, output: .message.usage.output_tokens})' "$session_file" 2>/dev/null || echo "[]")
+
+            if [[ -n "$from" ]] || [[ -n "$to" ]]; then
+                entries_json=$(echo "$entries_json" | jq --arg from "$from" --arg to "$to" \
+                    'map(select(.timestamp[0:10] >= $from and .timestamp[0:10] <= $to))' 2>/dev/null || echo "[]")
+            fi
+
+            if [[ "$(echo "$entries_json" | jq 'length')" -gt 0 ]]; then
+                local models
+                models=$(echo "$entries_json" | jq -r '.[].model' | sort -u || echo "")
+                for model in $models; do
+                    local current
+                    current=$(echo "$sessions_by_model" | jq -r ".\"$model\" // 0")
+                    sessions_by_model=$(echo "$sessions_by_model" | jq ".\"$model\" = $((current + 1))" 2>/dev/null || echo "{}")
+                done
+
+                all_entries=$(echo "$all_entries $entries_json" | jq -s 'add' 2>/dev/null || echo "$all_entries")
+            fi
+        fi
+    done
+
+    messages=$(echo "$all_entries" | jq 'length' 2>/dev/null || echo 0)
+    messages_by_model=$(echo "$all_entries" | jq 'group_by(.model) | map({key: .[0].model, value: length}) | from_entries' 2>/dev/null || echo '{}')
+    tokens_input=$(echo "$all_entries" | jq 'group_by(.model) | map({key: .[0].model, value: map(.input | tonumber) | add}) | from_entries' 2>/dev/null || echo '{}')
+    tokens_output=$(echo "$all_entries" | jq 'group_by(.model) | map({key: .[0].model, value: map(.output | tonumber) | add}) | from_entries' 2>/dev/null || echo '{}')
+    usage_by_date=$(echo "$all_entries" | jq 'group_by(.timestamp[0:10]) | map({key: .[0].timestamp[0:10], value: {sessions: (map(.model) | unique | length), messages: length}}) | from_entries' 2>/dev/null || echo '{}')
+
+    local tokens='{}'
+    local all_models
+    all_models=$(echo "$tokens_input" | jq -r 'keys[]' 2>/dev/null || echo "")
+    for model in $all_models; do
+        local inp out
+        inp=$(echo "$tokens_input" | jq -r ".\"$model\" // 0")
+        out=$(echo "$tokens_output" | jq -r ".\"$model\" // 0")
+        tokens=$(echo "$tokens" | jq ".\"$model\" = {input: $inp, output: $out}" 2>/dev/null || echo "{}")
+    done
+
+    jq -n \
+        --argjson found true \
+        --argjson sessions "$sessions" \
+        --argjson sessions_by_model "$sessions_by_model" \
+        --argjson messages "$messages" \
+        --argjson messages_by_model "$messages_by_model" \
+        --argjson tokens "$tokens" \
+        --argjson usage_by_date "$usage_by_date" \
+        '{
+            found: $found,
+            sessions: $sessions,
+            sessions_by_model: $sessions_by_model,
+            messages: $messages,
+            messages_by_model: $messages_by_model,
+            tokens: $tokens,
+            usage_by_date: $usage_by_date
+        }'
+}
+
+# --- Main ---
+
+main() {
+    check_jq
+
+    local project
+    local opencode_json claude_json
+
+    if [[ "$ALL_PROJECTS" == "true" ]]; then
+        project=""
+        opencode_json=$(load_opencode_all)
+        claude_json=$(load_claude_all)
+    elif [[ -n "$PROJECT_PATH" ]]; then
+        project="$PROJECT_PATH"
+        opencode_json=$(load_opencode_stats "$PROJECT_PATH")
+        claude_json=$(load_claude_stats "$PROJECT_PATH")
+    else
+        # Auto-detect project from current directory
+        project=$(pwd)
+        opencode_json=$(load_opencode_stats "$project")
+        claude_json=$(load_claude_stats "$project")
+
+        # If not found, try walking up
+        if echo "$opencode_json" | jq -e '.found == false' &>/dev/null && \
+           echo "$claude_json" | jq -e '.found == false' &>/dev/null; then
+            project=""
+            # Try to find by walking up
+            local dir
+            dir=$(pwd)
+            while [[ "$dir" != "/" ]]; do
+                local oc_check cl_check
+                oc_check=$(load_opencode_stats "$dir")
+                cl_check=$(load_claude_stats "$dir")
+                if echo "$oc_check" | jq -e '.found == true' >/dev/null 2>&1 || \
+                   echo "$cl_check" | jq -e '.found == true' >/dev/null 2>&1; then
+                    project="$dir"
+                    opencode_json="$oc_check"
+                    claude_json="$cl_check"
+                    break
+                fi
+                dir=$(dirname "$dir")
+            done
+        fi
+    fi
+
+    # If still not found and not --all, show helpful error
+    if [[ "$ALL_PROJECTS" != "true" ]] && [[ -z "$project" ]]; then
+        echo "No LLM usage data found for current directory." >&2
+        echo "" >&2
+        echo "Nearby projects with data:" >&2
+
+        # List nearby OpenCode projects
+        if [[ -d "$OPENCODE_STORAGE/project" ]]; then
+            for pf in "$OPENCODE_STORAGE"/project/*.json; do
+                if [[ -f "$pf" ]]; then
+                    local wt
+                    wt=$(jq -r '.worktree' "$pf" 2>/dev/null || echo "")
+                    if [[ -n "$wt" ]]; then
+                        echo "  - $wt (OpenCode)" >&2
+                    fi
+                fi
+            done
+        fi
+
+        # List nearby Claude projects
+        if [[ -d "$CLAUDE_PROJECTS" ]]; then
+            for pd in "$CLAUDE_PROJECTS"/*; do
+                if [[ -d "$pd" ]]; then
+                    local name
+                    name=$(basename "$pd")
+                    # Decode the name
+                    local decoded
+                    decoded=$(echo "$name" | sed 's/%2F/\//g; s/^-//')
+                    echo "  - $decoded (Claude Code)" >&2
+                fi
+            done
+        fi
+
+        exit 1
+    fi
+
+    # Output JSON using jq to build the object
+    jq -n \
+        --arg generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+        --arg project "$project" \
+        --arg from "${FROM_DATE:-}" \
+        --arg to "${TO_DATE:-}" \
+        --argjson opencode "$opencode_json" \
+        --argjson claude "$claude_json" \
+        '{
+            generated_at: $generated_at,
+            project: $project,
+            time_range: { from: $from, to: $to },
+            opencode: $opencode,
+            claude_code: $claude
+        }'
+}
+
+main

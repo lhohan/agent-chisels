@@ -7,3 +7,6 @@ result-*
 
 # Ignore local user-specific configuration files
 *.local.*
+
+# LLM stuff
+**/.clavix/
