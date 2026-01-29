@@ -2,6 +2,23 @@
 
 Decisions are listed in reverse chronological order (most recent first).
 
+### AC-004: Introduce agentfiles/ for centralized multi-agent configuration management [Status: Proposed]
+
+> **In the context of** managing configurations for multiple CLI agents (Claude Code, OpenCode, Mistral Vibe) in a single repository,
+> **facing** the need to share skills, commands, agents, and prompts across different tools while deploying to their respective home directory locations,
+> **we decided** to create an `agentfiles/` directory with shared artifacts and per-agent stow packages, moving skills from root `skills/` to `agentfiles/shared/skills/`,
+> **to achieve** centralized configuration management with minimal duplication, GNU Stow-based deployment, and maintainable symlink architecture,
+> **accepting** the need to update existing plugin symlinks, add mise-en-place tooling, and maintain a two-level symlink chain (home → agent-config → shared).
+
+**Key architectural choices:**
+- `agentfiles/shared/` becomes single source of truth for skills (replacing root `skills/`)
+- Each agent (claude-code, opencode, mistral-vibe) is a stow package
+- Two-level symlinks: `~/.claude/skills/x` → `agentfiles/claude-code/.claude/skills/x` → `agentfiles/shared/skills/x`
+- `--no-folding` flag ensures stow creates individual symlinks, preserving existing content in target directories
+- Plugins at root update symlinks to `../../agentfiles/shared/skills/`
+- Existing `.claude/` kept as project-level config for this repo
+- Mise tasks for stow deployment (`stow-all`, `stow-claude`, etc.)
+
 ### AC-003: Use imperative form for skill names [Status: Implemented]
 
 > **In the context of** skills moving closer to or becoming commands,
