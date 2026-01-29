@@ -13,7 +13,7 @@ plugins/
 └── [plugin-name]/
     ├── .claude-plugin/
     │   └── plugin.json        # Plugin metadata (name only)
-    ├── skills/                # Symlinks to ../../skills/[skill-name]
+    ├── skills/                # Symlinks to ../../../agentfiles/shared/skills/[skill-name]
     ├── commands/
     ├── agents/
     └── hooks/
@@ -72,7 +72,7 @@ Decisions should be updated so the decision log and implementation stay consiste
    - Test commands and agents as applicable
 
 3. **Update documentation**:
-    - Add new skills to `skills/README.md` with name and concise description (1-3 sentences max)
+    - Add new skills to `agentfiles/shared/skills/README.md` with name and concise description (1-3 sentences max)
     - Update plugin-to-skill mapping in `plugins/README.md`
     - Update versions in both:
       - `plugins/[plugin-name]/.claude-plugin/plugin.json`

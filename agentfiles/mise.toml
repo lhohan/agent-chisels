@@ -1,0 +1,59 @@
+[tasks."stow:check"]
+description = "Verify stow is installed"
+run = """
+if command -v stow >/dev/null 2>&1; then
+  echo "stow $(stow --version 2>&1 | head -1) found at $(command -v stow)"
+else
+  echo "ERROR: stow is not installed." >&2
+  echo "Install via: brew install stow (macOS) or nix develop (flake.nix)" >&2
+  exit 1
+fi
+"""
+
+[tasks."stow:claude-code"]
+description = "Deploy claude-code agent config to ~"
+run = "stow -v --no-folding -t ~ claude-code"
+
+[tasks."unstow:claude-code"]
+description = "Remove claude-code agent config from ~"
+run = "stow -Dv --no-folding -t ~ claude-code"
+
+[tasks."stow:opencode"]
+description = "Deploy opencode agent config to ~"
+run = "stow -v --no-folding -t ~ opencode"
+
+[tasks."unstow:opencode"]
+description = "Remove opencode agent config from ~"
+run = "stow -Dv --no-folding -t ~ opencode"
+
+[tasks."stow:mistral-vibe"]
+description = "Deploy mistral-vibe agent config to ~"
+run = "stow -v --no-folding -t ~ mistral-vibe"
+
+[tasks."unstow:mistral-vibe"]
+description = "Remove mistral-vibe agent config from ~"
+run = "stow -Dv --no-folding -t ~ mistral-vibe"
+
+[tasks."stow:all"]
+description = "Deploy all agent configs to ~"
+depends = ["stow:claude-code", "stow:opencode", "stow:mistral-vibe"]
+
+[tasks."unstow:all"]
+description = "Remove all agent configs from ~"
+depends = ["unstow:claude-code", "unstow:opencode", "unstow:mistral-vibe"]
+
+[tasks."stow:dry-run:claude-code"]
+description = "Preview claude-code deployment (no changes)"
+run = "stow -nv --no-folding -t ~ claude-code"
+
+[tasks."stow:dry-run:opencode"]
+description = "Preview opencode deployment (no changes)"
+run = "stow -nv --no-folding -t ~ opencode"
+
+[tasks."stow:dry-run:mistral-vibe"]
+description = "Preview mistral-vibe deployment (no changes)"
+run = "stow -nv --no-folding -t ~ mistral-vibe"
+
+[tasks."stow:dry-run:all"]
+description = "Preview all agent deployments (no changes)"
+depends = ["stow:dry-run:claude-code", "stow:dry-run:opencode", "stow:dry-run:mistral-vibe"]
