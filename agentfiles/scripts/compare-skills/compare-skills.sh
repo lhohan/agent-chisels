@@ -14,15 +14,87 @@ PROMPT_FILE="$(dirname "$0")/list-available-skills.md"
 tmp_dir="$(mktemp -d)"
 keep_temp=false
 
+COLOR_RESET=""
+COLOR_GREEN=""
+ERROR_RESET=""
+ERROR_BOLD=""
+ERROR_RED=""
+ERROR_YELLOW=""
+
+setup_colors() {
+    if [[ -t 1 && -n "${TERM:-}" && "$TERM" != "dumb" ]]; then
+        COLOR_RESET=$'\033[0m'
+        COLOR_GREEN=$'\033[32m'
+    fi
+
+    if [[ -t 2 && -n "${TERM:-}" && "$TERM" != "dumb" ]]; then
+        ERROR_RESET=$'\033[0m'
+        ERROR_BOLD=$'\033[1m'
+        ERROR_RED=$'\033[31m'
+        ERROR_YELLOW=$'\033[33m'
+    fi
+}
+
+setup_colors
+
+log_info() {
+    printf '%s\n' "$*" >&2
+}
+
+log_success() {
+    printf '%b\n' "${COLOR_GREEN}$*${COLOR_RESET}" >&2
+}
+
+log_warn() {
+    printf '%b\n' "${ERROR_YELLOW}Warning: $*${ERROR_RESET}" >&2
+}
+
+log_error() {
+    printf '%b\n' "${ERROR_RED}Error: $*${ERROR_RESET}" >&2
+}
+
 cleanup() {
     if [[ "$keep_temp" == "true" ]]; then
-        echo "Keeping temp files in $tmp_dir" >&2
+        log_warn "Keeping temp files in $tmp_dir"
     else
         rm -rf "$tmp_dir"
     fi
 }
 
 trap cleanup EXIT
+
+json_escape() {
+    local value="$1"
+    value=${value//\\/\\\\}
+    value=${value//"/\\"}
+    value=${value//$'\n'/\\n}
+    value=${value//$'\r'/\\r}
+    value=${value//$'\t'/\\t}
+    printf '%s' "$value"
+}
+
+print_json_array_inline() {
+    local close_indent="$1"
+    local item_indent="$2"
+    shift 2
+    local items=("$@")
+
+    if [[ ${#items[@]} -eq 0 ]]; then
+        printf '[]'
+        return 0
+    fi
+
+    printf '[\n'
+    local last_index=$(( ${#items[@]} - 1 ))
+    for i in "${!items[@]}"; do
+        local comma=","
+        if [[ $i -eq $last_index ]]; then
+            comma=""
+        fi
+        printf '%s"%s"%s\n' "$item_indent" "$(json_escape "${items[$i]}")" "$comma"
+    done
+    printf '%s]' "$close_indent"
+}
 
 parse_skills() {
     local input_file="$1"
@@ -45,9 +117,9 @@ show_file() {
     local file_path="$2"
 
     if [[ -s "$file_path" ]]; then
-        echo "---- ${label} ----" >&2
+        printf '%b\n' "${ERROR_BOLD}---- ${label} ----${ERROR_RESET}" >&2
         cat "$file_path" >&2
-        echo "---- end ${label} ----" >&2
+        printf '%b\n' "${ERROR_BOLD}---- end ${label} ----${ERROR_RESET}" >&2
     fi
 }
 
@@ -83,7 +155,7 @@ run_agent() {
             vibe --agent explore --prompt < "$PROMPT_FILE"
             ;;
         *)
-            echo "Error: Unknown agent '$agent_name'" >&2
+            log_error "Unknown agent '$agent_name'"
             return 2
             ;;
     esac
@@ -96,10 +168,31 @@ validate_agent() {
             return 0
             ;;
         *)
-            echo "Error: Unknown agent '$agent_name'" >&2
+            log_error "Unknown agent '$agent_name'"
             return 2
             ;;
     esac
+}
+
+declare -a error_agents
+declare -a error_codes
+declare -a error_messages
+declare -a error_commands
+error_agents=()
+error_codes=()
+error_messages=()
+error_commands=()
+
+add_error() {
+    local agent="$1"
+    local code="$2"
+    local message="$3"
+    local command="${4:-}"
+
+    error_agents+=("$agent")
+    error_codes+=("$code")
+    error_messages+=("$message")
+    error_commands+=("$command")
 }
 
 call_agent() {
@@ -110,8 +203,10 @@ call_agent() {
 
     if ! run_agent "$agent_name" > "$stdout_file" 2> "$stderr_file"; then
         keep_temp=true
-        echo "Error: $agent_name command failed." >&2
+        log_error "$agent_name command failed."
+        local command_line
         command_line="$(agent_command "$agent_name")"
+        add_error "$agent_name" "agent_failed" "Agent command failed." "$command_line"
         if [[ -n "$command_line" ]]; then
             echo "Command: $command_line" >&2
         fi
@@ -123,23 +218,13 @@ call_agent() {
 
     if [[ ! -s "$skills_file" ]] && ! grep -Fxq "No agent skills found." "$stdout_file"; then
         keep_temp=true
-        echo "Error: No skills parsed for $agent_name." >&2
+        log_error "No skills parsed for $agent_name."
+        add_error "$agent_name" "no_skills_parsed" "No skills parsed from agent output." ""
         show_file "$agent_name stdout" "$stdout_file"
         return 1
     fi
 
     echo "$skills_file"
-}
-
-print_skills() {
-    local file_path="$1"
-    if [[ -s "$file_path" ]]; then
-        while IFS= read -r skill; do
-            echo "* $skill"
-        done < "$file_path"
-    else
-        echo "No agent skills found."
-    fi
 }
 
 intersect_files() {
@@ -159,98 +244,228 @@ intersect_files() {
 
 # Main execution
 if [[ ! -f "$PROMPT_FILE" ]]; then
-    echo "Error: Prompt file not found at $PROMPT_FILE" >&2
-    exit 2
-fi
-
-if [[ $# -eq 0 ]]; then
+    log_error "Prompt file not found at $PROMPT_FILE"
+    add_error "" "prompt_missing" "Prompt file not found." ""
+    status="error"
+    exit_code=2
     agents=("${DEFAULT_AGENTS[@]}")
+    successful_agents=()
+    failed_agents=()
+    skill_files=()
+    comparison_performed=false
+    all_match=null
+    common_skills=()
+    only_in_files=()
 else
-    agents=("$@")
-fi
-
-declare -A skill_files
-successful_agents=()
-failed_agents=()
-
-for agent in "${agents[@]}"; do
-    echo "=== Comparing skills for agent: $agent ==="
-    if ! validate_agent "$agent"; then
-        failed_agents+=("$agent")
-        continue
-    fi
-    if skill_path="$(call_agent "$agent")"; then
-        skill_files["$agent"]="$skill_path"
-        successful_agents+=("$agent")
+    if [[ $# -eq 0 ]]; then
+        agents=("${DEFAULT_AGENTS[@]}")
     else
-        failed_agents+=("$agent")
+        agents=("$@")
     fi
-done
 
-if [[ ${#successful_agents[@]} -eq 0 ]]; then
-    echo "No agents succeeded; no comparison performed." >&2
-    exit 2
-fi
+    declare -A skill_files
+    declare -A only_in_files
+    successful_agents=()
+    failed_agents=()
 
-if [[ ${#successful_agents[@]} -lt 2 ]]; then
-    echo "Only one agent succeeded; no comparison performed."
-    print_skills "${skill_files["${successful_agents[0]}"]}"
-    if [[ ${#failed_agents[@]} -gt 0 ]]; then
-        exit 1
-    fi
-    exit 0
-fi
-
-base_agent="${successful_agents[0]}"
-base_file="${skill_files["$base_agent"]}"
-all_match=true
-
-for agent in "${successful_agents[@]:1}"; do
-    if ! cmp -s "$base_file" "${skill_files["$agent"]}"; then
-        all_match=false
-        break
-    fi
-done
-
-if [[ "$all_match" == "true" ]]; then
-    echo "All skills match across: ${successful_agents[*]}"
-    print_skills "$base_file"
-    if [[ ${#failed_agents[@]} -gt 0 ]]; then
-        exit 1
-    fi
-    exit 0
-fi
-
-common_file="$tmp_dir/common.skills"
-files_to_intersect=()
-for agent in "${successful_agents[@]}"; do
-    files_to_intersect+=("${skill_files["$agent"]}")
-done
-intersect_files "$common_file" "${files_to_intersect[@]}"
-
-echo "Common skills:"
-print_skills "$common_file"
-
-for agent in "${successful_agents[@]}"; do
-    others_union="$tmp_dir/${agent}.others.union"
-    : > "$others_union"
-    for other in "${successful_agents[@]}"; do
-        if [[ "$other" != "$agent" ]]; then
-            cat "${skill_files["$other"]}" >> "$others_union"
+    for agent in "${agents[@]}"; do
+        log_info "=== Comparing skills for agent: $agent ==="
+        if ! validate_agent "$agent"; then
+            add_error "$agent" "unknown_agent" "Unknown agent '$agent'." ""
+            failed_agents+=("$agent")
+            continue
+        fi
+        if skill_path="$(call_agent "$agent")"; then
+            skill_files["$agent"]="$skill_path"
+            successful_agents+=("$agent")
+        else
+            failed_agents+=("$agent")
         fi
     done
-    sort -u "$others_union" -o "$others_union"
 
-    only_file="$tmp_dir/${agent}.only"
-    comm -23 "${skill_files["$agent"]}" "$others_union" > "$only_file"
+    comparison_performed=false
+    all_match=null
+    common_skills=()
 
-    echo "Only in $agent:"
-    print_skills "$only_file"
-done
+    if [[ ${#successful_agents[@]} -eq 0 ]]; then
+        log_error "No agents succeeded; no comparison performed."
+        add_error "" "no_agents_succeeded" "No agents succeeded; no comparison performed." ""
+        status="error"
+        exit_code=2
+    elif [[ ${#successful_agents[@]} -lt 2 ]]; then
+        log_warn "Only one agent succeeded; no comparison performed."
+        add_error "" "insufficient_agents" "Only one agent succeeded; no comparison performed." ""
+        status="error"
+        exit_code=2
+    else
+        comparison_performed=true
+        base_agent="${successful_agents[0]}"
+        base_file="${skill_files["$base_agent"]}"
+        all_match=true
 
-if [[ ${#failed_agents[@]} -gt 0 ]]; then
-    echo "Some agents failed: ${failed_agents[*]}" >&2
-    exit 1
+        for agent in "${successful_agents[@]:1}"; do
+            if ! cmp -s "$base_file" "${skill_files["$agent"]}"; then
+                all_match=false
+                break
+            fi
+        done
+
+        common_file="$tmp_dir/common.skills"
+        files_to_intersect=()
+        for agent in "${successful_agents[@]}"; do
+            files_to_intersect+=("${skill_files["$agent"]}")
+        done
+        intersect_files "$common_file" "${files_to_intersect[@]}"
+        mapfile -t common_skills < "$common_file"
+
+        for agent in "${successful_agents[@]}"; do
+            others_union="$tmp_dir/${agent}.others.union"
+            : > "$others_union"
+            for other in "${successful_agents[@]}"; do
+                if [[ "$other" != "$agent" ]]; then
+                    cat "${skill_files["$other"]}" >> "$others_union"
+                fi
+            done
+            sort -u "$others_union" -o "$others_union"
+
+            only_file="$tmp_dir/${agent}.only"
+            comm -23 "${skill_files["$agent"]}" "$others_union" > "$only_file"
+            only_in_files["$agent"]="$only_file"
+        done
+
+        if [[ ${#failed_agents[@]} -gt 0 ]]; then
+            status="partial"
+            exit_code=3
+        elif [[ "$all_match" == "true" ]]; then
+            status="ok"
+            exit_code=0
+        else
+            status="diff"
+            exit_code=1
+        fi
+    fi
 fi
 
-exit 1
+# Emit JSON to stdout
+printf '{\n'
+printf '  "format_version": 1,\n'
+printf '  "status": "%s",\n' "$(json_escape "$status")"
+printf '  "exit_code": %s,\n' "$exit_code"
+printf '  "prompt_file": "%s",\n' "$(json_escape "$PROMPT_FILE")"
+
+printf '  "agents": {\n'
+printf '    "requested": '
+print_json_array_inline "    " "      " "${agents[@]}"
+printf ',\n'
+printf '    "successful": '
+print_json_array_inline "    " "      " "${successful_agents[@]}"
+printf ',\n'
+printf '    "failed": '
+print_json_array_inline "    " "      " "${failed_agents[@]}"
+printf '\n'
+printf '  },\n'
+
+printf '  "skills": {\n'
+printf '    "per_agent": {\n'
+if [[ ${#successful_agents[@]} -gt 0 ]]; then
+    last_index=$(( ${#successful_agents[@]} - 1 ))
+    for i in "${!successful_agents[@]}"; do
+        agent="${successful_agents[$i]}"
+        printf '      "%s": ' "$(json_escape "$agent")"
+        mapfile -t agent_skills < "${skill_files["$agent"]}"
+        print_json_array_inline "      " "        " "${agent_skills[@]}"
+        if [[ $i -lt $last_index ]]; then
+            printf ',\n'
+        else
+            printf '\n'
+        fi
+    done
+fi
+printf '    },\n'
+printf '    "common": '
+print_json_array_inline "    " "      " "${common_skills[@]}"
+printf '\n'
+printf '  },\n'
+
+printf '  "comparison": {\n'
+printf '    "performed": %s,\n' "$comparison_performed"
+if [[ "$comparison_performed" == "true" ]]; then
+    printf '    "all_match": %s,\n' "$all_match"
+    printf '    "only_in": {\n'
+    if [[ ${#successful_agents[@]} -gt 0 ]]; then
+        last_index=$(( ${#successful_agents[@]} - 1 ))
+        for i in "${!successful_agents[@]}"; do
+            agent="${successful_agents[$i]}"
+            printf '      "%s": ' "$(json_escape "$agent")"
+            mapfile -t only_skills < "${only_in_files["$agent"]}"
+            print_json_array_inline "      " "        " "${only_skills[@]}"
+            if [[ $i -lt $last_index ]]; then
+                printf ',\n'
+            else
+                printf '\n'
+            fi
+        done
+    fi
+    printf '    }\n'
+else
+    printf '    "all_match": null,\n'
+    printf '    "only_in": {}\n'
+fi
+printf '  },\n'
+
+printf '  "errors": '
+if [[ ${#error_agents[@]} -eq 0 ]]; then
+    printf '[]'
+else
+    printf '[\n'
+    last_index=$(( ${#error_agents[@]} - 1 ))
+    for i in "${!error_agents[@]}"; do
+        agent="${error_agents[$i]}"
+        code="${error_codes[$i]}"
+        message="${error_messages[$i]}"
+        command="${error_commands[$i]}"
+        printf '    {\n'
+        if [[ -n "$agent" ]]; then
+            printf '      "agent": "%s",\n' "$(json_escape "$agent")"
+        else
+            printf '      "agent": null,\n'
+        fi
+        printf '      "code": "%s",\n' "$(json_escape "$code")"
+        printf '      "message": "%s",\n' "$(json_escape "$message")"
+        if [[ -n "$command" ]]; then
+            printf '      "command": "%s"\n' "$(json_escape "$command")"
+        else
+            printf '      "command": null\n'
+        fi
+        if [[ $i -lt $last_index ]]; then
+            printf '    },\n'
+        else
+            printf '    }\n'
+        fi
+    done
+    printf '  ]'
+fi
+
+printf ',\n'
+printf '  "counts": {\n'
+printf '    "per_agent": {\n'
+if [[ ${#successful_agents[@]} -gt 0 ]]; then
+    last_index=$(( ${#successful_agents[@]} - 1 ))
+    for i in "${!successful_agents[@]}"; do
+        agent="${successful_agents[$i]}"
+        mapfile -t agent_skills < "${skill_files["$agent"]}"
+        printf '      "%s": %s' "$(json_escape "$agent")" "${#agent_skills[@]}"
+        if [[ $i -lt $last_index ]]; then
+            printf ',\n'
+        else
+            printf '\n'
+        fi
+    done
+fi
+printf '    },\n'
+printf '    "common": %s\n' "${#common_skills[@]}"
+printf '  }\n'
+
+printf '}\n'
+
+exit "$exit_code"
