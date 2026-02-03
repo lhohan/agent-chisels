@@ -51,6 +51,24 @@ show_file() {
     fi
 }
 
+agent_command() {
+    local agent_name="$1"
+    case "$agent_name" in
+        codex)
+            echo "codex --model \"gpt-5.1-codex-mini\" exec < \"$PROMPT_FILE\""
+            ;;
+        opencode)
+            echo "opencode --model \"mistral/labs-devstral-small-2512\" run < \"$PROMPT_FILE\""
+            ;;
+        mistral-vibe|vibe)
+            echo "vibe --agent explore --prompt < \"$PROMPT_FILE\""
+            ;;
+        *)
+            echo ""
+            ;;
+    esac
+}
+
 run_agent() {
     local agent_name="$1"
 
@@ -93,6 +111,10 @@ call_agent() {
     if ! run_agent "$agent_name" > "$stdout_file" 2> "$stderr_file"; then
         keep_temp=true
         echo "Error: $agent_name command failed." >&2
+        command_line="$(agent_command "$agent_name")"
+        if [[ -n "$command_line" ]]; then
+            echo "Command: $command_line" >&2
+        fi
         show_file "$agent_name stderr" "$stderr_file"
         return 1
     fi
