@@ -40,6 +40,17 @@ parse_skills() {
     }' "$input_file" | sort -u > "$output_file"
 }
 
+show_file() {
+    local label="$1"
+    local file_path="$2"
+
+    if [[ -s "$file_path" ]]; then
+        echo "---- ${label} ----" >&2
+        cat "$file_path" >&2
+        echo "---- end ${label} ----" >&2
+    fi
+}
+
 run_agent() {
     local agent_name="$1"
 
@@ -60,6 +71,19 @@ run_agent() {
     esac
 }
 
+validate_agent() {
+    local agent_name="$1"
+    case "$agent_name" in
+        codex|opencode|mistral-vibe|vibe)
+            return 0
+            ;;
+        *)
+            echo "Error: Unknown agent '$agent_name'" >&2
+            return 2
+            ;;
+    esac
+}
+
 call_agent() {
     local agent_name="$1"
     local stdout_file="$tmp_dir/${agent_name}.stdout"
@@ -68,7 +92,8 @@ call_agent() {
 
     if ! run_agent "$agent_name" > "$stdout_file" 2> "$stderr_file"; then
         keep_temp=true
-        echo "Error: $agent_name command failed. See $stderr_file" >&2
+        echo "Error: $agent_name command failed." >&2
+        show_file "$agent_name stderr" "$stderr_file"
         return 1
     fi
 
@@ -76,7 +101,8 @@ call_agent() {
 
     if [[ ! -s "$skills_file" ]] && ! grep -Fxq "No agent skills found." "$stdout_file"; then
         keep_temp=true
-        echo "Error: No skills parsed for $agent_name. See $stdout_file" >&2
+        echo "Error: No skills parsed for $agent_name." >&2
+        show_file "$agent_name stdout" "$stdout_file"
         return 1
     fi
 
@@ -124,6 +150,9 @@ fi
 declare -A skill_files
 
 for agent in "${agents[@]}"; do
+    if ! validate_agent "$agent"; then
+        exit 2
+    fi
     echo "=== Comparing skills for agent: $agent ==="
     skill_files["$agent"]="$(call_agent "$agent")"
 done
