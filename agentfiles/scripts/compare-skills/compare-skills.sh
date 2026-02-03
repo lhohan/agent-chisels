@@ -275,6 +275,10 @@ else
             failed_agents+=("$agent")
             continue
         fi
+        command_line="$(agent_command "$agent")"
+        if [[ -n "$command_line" ]]; then
+            log_info "Command: $command_line"
+        fi
         if skill_path="$(call_agent "$agent")"; then
             skill_files["$agent"]="$skill_path"
             successful_agents+=("$agent")
