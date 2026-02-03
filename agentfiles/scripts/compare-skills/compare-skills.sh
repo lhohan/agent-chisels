@@ -148,26 +148,42 @@ else
 fi
 
 declare -A skill_files
+successful_agents=()
+failed_agents=()
 
 for agent in "${agents[@]}"; do
-    if ! validate_agent "$agent"; then
-        exit 2
-    fi
     echo "=== Comparing skills for agent: $agent ==="
-    skill_files["$agent"]="$(call_agent "$agent")"
+    if ! validate_agent "$agent"; then
+        failed_agents+=("$agent")
+        continue
+    fi
+    if skill_path="$(call_agent "$agent")"; then
+        skill_files["$agent"]="$skill_path"
+        successful_agents+=("$agent")
+    else
+        failed_agents+=("$agent")
+    fi
 done
 
-if [[ ${#agents[@]} -lt 2 ]]; then
-    echo "Only one agent specified; no comparison performed."
-    print_skills "${skill_files["${agents[0]}"]}"
+if [[ ${#successful_agents[@]} -eq 0 ]]; then
+    echo "No agents succeeded; no comparison performed." >&2
+    exit 2
+fi
+
+if [[ ${#successful_agents[@]} -lt 2 ]]; then
+    echo "Only one agent succeeded; no comparison performed."
+    print_skills "${skill_files["${successful_agents[0]}"]}"
+    if [[ ${#failed_agents[@]} -gt 0 ]]; then
+        exit 1
+    fi
     exit 0
 fi
 
-base_agent="${agents[0]}"
+base_agent="${successful_agents[0]}"
 base_file="${skill_files["$base_agent"]}"
 all_match=true
 
-for agent in "${agents[@]:1}"; do
+for agent in "${successful_agents[@]:1}"; do
     if ! cmp -s "$base_file" "${skill_files["$agent"]}"; then
         all_match=false
         break
@@ -175,14 +191,17 @@ for agent in "${agents[@]:1}"; do
 done
 
 if [[ "$all_match" == "true" ]]; then
-    echo "All skills match across: ${agents[*]}"
+    echo "All skills match across: ${successful_agents[*]}"
     print_skills "$base_file"
+    if [[ ${#failed_agents[@]} -gt 0 ]]; then
+        exit 1
+    fi
     exit 0
 fi
 
 common_file="$tmp_dir/common.skills"
 files_to_intersect=()
-for agent in "${agents[@]}"; do
+for agent in "${successful_agents[@]}"; do
     files_to_intersect+=("${skill_files["$agent"]}")
 done
 intersect_files "$common_file" "${files_to_intersect[@]}"
@@ -190,10 +209,10 @@ intersect_files "$common_file" "${files_to_intersect[@]}"
 echo "Common skills:"
 print_skills "$common_file"
 
-for agent in "${agents[@]}"; do
+for agent in "${successful_agents[@]}"; do
     others_union="$tmp_dir/${agent}.others.union"
     : > "$others_union"
-    for other in "${agents[@]}"; do
+    for other in "${successful_agents[@]}"; do
         if [[ "$other" != "$agent" ]]; then
             cat "${skill_files["$other"]}" >> "$others_union"
         fi
@@ -206,5 +225,10 @@ for agent in "${agents[@]}"; do
     echo "Only in $agent:"
     print_skills "$only_file"
 done
+
+if [[ ${#failed_agents[@]} -gt 0 ]]; then
+    echo "Some agents failed: ${failed_agents[*]}" >&2
+    exit 1
+fi
 
 exit 1
