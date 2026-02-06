@@ -6,7 +6,7 @@ This directory contains shared agent artifacts and per-agent Stow packages.
 - `shared/` is the source of truth:
   - `shared/skills/` (skills as `SKILL.md`)
   - `shared/commands/`, `shared/agents/`, `shared/prompts/`
-- `claude-code/`, `opencode/`, `mistral-vibe/` are GNU Stow packages that expose
+- `codex/`, `claude-code/`, `opencode/`, `mistral-vibe/` are GNU Stow packages that expose
   symlinked content into tool-specific config roots (for example, `~/.claude/`).
 - `mise.toml` defines reusable tasks for Stow deployment.
 
