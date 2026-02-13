@@ -14,7 +14,7 @@ This prompt outputs the available skills in a strictly prescribed format.
 
 ```
 * review-code
-* analyse-open-changes
+* check-open-changes
 ```
 
 ## Procedure
