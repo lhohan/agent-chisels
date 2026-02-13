@@ -1,7 +1,7 @@
 ---
 name: detect-jujutsu
 description: Verify if the current repository uses Jujutsu (jj) instead of git. Use this skill when you or the user needs to confirm the version control system (VCS) state before performing operations.
-version: 0.2.1
+version: 0.2.2
 ---
 
 # Detecting Jujutsu (jj)
@@ -13,7 +13,8 @@ This repository uses **Jujutsu (jj)** as its version control if confirmed by the
 To verify if this is a Jujutsu repository, you **MUST** run the following script using the Bash tool:
 
 ```bash
-bash skills/detect-jujutsu/scripts/detect-jj.sh
+# If you're in the agent-chisels repo:
+bash scripts/detect-jj.sh
 ```
 
 This works from the repository root directory.

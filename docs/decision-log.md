@@ -35,7 +35,7 @@ Decisions are listed in reverse chronological order (most recent first).
 | `writing-agents-files` | `write-agents-files` |
 | `documenting-architectural-decisions` | `document-architectural-decisions` |
 
-See [skills/AGENTS.md](./skills/AGENTS.md) for updated naming conventions.
+See [plugins/AGENTS.md](../plugins/AGENTS.md) for updated naming conventions.
 
 ### AC-002: Use `.claude/skills/` at project level for skill discovery and dog-fooding across different AI agents [Status: Implemented]
 

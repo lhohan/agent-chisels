@@ -1,6 +1,6 @@
 ---
 name: verify-release-readiness
-version: 0.1.0
+version: 0.1.1
 description: Verify release readiness by detecting changed skills, checking version updates, and running validation scripts. Use before creating releases or publishing to marketplace.
 ---
 
@@ -77,13 +77,13 @@ Found X changed skills:
   - Current version: 0.2.0
   - Main version: 0.1.0
   - Status: Version updated ✓
-  - Changed files: skills/skill-name-1/SKILL.md
+  - Changed files: agentfiles/shared/skills/skill-name-1/SKILL.md
 
 ⚠ skill-name-2
   - Current version: 0.3.0
   - Main version: 0.3.0
   - Status: Version NOT updated ⚠
-  - Changed files: skills/skill-name-2/SKILL.md, skills/skill-name-2/README.md
+  - Changed files: agentfiles/shared/skills/skill-name-2/SKILL.md, agentfiles/shared/skills/skill-name-2/README.md
 ```
 
 ### Step 4: Wait for User to Update Versions
@@ -156,14 +156,14 @@ Ready to commit and release!
       "current_version": "0.2.0",
       "main_version": "0.1.0",
       "needs_update": false,
-      "changed_files": ["skills/detect-jujutsu/SKILL.md"]
+      "changed_files": ["agentfiles/shared/skills/detect-jujutsu/SKILL.md"]
     },
     {
       "name": "use-jujutsu",
       "current_version": "0.2.0",
       "main_version": "0.2.0",
       "needs_update": true,
-      "changed_files": ["skills/use-jujutsu/SKILL.md", "skills/use-jujutsu/scripts/detect.sh"]
+      "changed_files": ["agentfiles/shared/skills/use-jujutsu/SKILL.md", "agentfiles/shared/skills/use-jujutsu/scripts/detect.sh"]
     }
   ]
 }

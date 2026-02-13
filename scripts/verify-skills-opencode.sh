@@ -32,7 +32,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-SKILLS_DIR="$REPO_ROOT/skills"
+SKILLS_DIR="$REPO_ROOT/agentfiles/shared/skills"
 
 ##############################################################################
 # Discover all skills in the skills directory
@@ -63,14 +63,14 @@ TEST_NUM=0
 ##############################################################################
 
 tap_ok() {
-    ((TEST_NUM++))
-    ((PASS++))
+    ((TEST_NUM+=1))
+    ((PASS+=1))
     echo "ok $TEST_NUM - $1"
 }
 
 tap_not_ok() {
-    ((TEST_NUM++))
-    ((FAIL++))
+    ((TEST_NUM+=1))
+    ((FAIL+=1))
     echo "not ok $TEST_NUM - $1"
     if [[ -n "$2" ]]; then
         echo "# $2"
@@ -85,19 +85,21 @@ check_prerequisites() {
         return 1
     fi
 
-    # Check if .claude/skills exists (should be created by sync-skills.sh)
+    # Check if .claude/skills exists (should include symlinks created by sync-skills.sh)
     if [[ ! -d "$REPO_ROOT/.claude/skills" ]]; then
         echo "not ok - .claude/skills directory not found"
         echo "# Run: ./scripts/sync-skills.sh"
         return 1
     fi
 
-    # Check if at least one skill symlink exists
-    if ! ls "$REPO_ROOT/.claude/skills"/* &> /dev/null; then
-        echo "not ok - No skills found in .claude/skills"
-        echo "# Run: ./scripts/sync-skills.sh"
-        return 1
-    fi
+    # Check if expected skills exist in .claude/skills
+    for skill_name in "${EXPECTED_SKILLS[@]}"; do
+        if [[ ! -e "$REPO_ROOT/.claude/skills/$skill_name" ]]; then
+            echo "not ok - Missing skill '$skill_name' in .claude/skills"
+            echo "# Run: ./scripts/sync-skills.sh"
+            return 1
+        fi
+    done
 
     return 0
 }

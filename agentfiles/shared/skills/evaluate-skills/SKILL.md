@@ -1,7 +1,7 @@
 ---
 name: evaluate-skills
 description: Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
-version: "1.0.0"
+version: "1.0.1"
 ---
 
 # Claude Code Skill Evaluator
@@ -132,7 +132,7 @@ Evaluate the skill across **10 dimensions**:
 #### Dimension 6: Structure & Organization
 **Guidelines:**
 - Clear section hierarchy (headings, subsections)
-- Logical flow (progressive disclosure)
+- Logical flow (progressive disclosure): start with a small, stable entry point and point to deeper sections/references rather than front-loading everything
 - Step-by-step instructions preferred for workflows
 - Rules/constraints clearly stated
 

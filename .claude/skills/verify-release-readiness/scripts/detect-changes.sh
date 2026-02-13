@@ -23,15 +23,18 @@
 
 set -e
 
+BASE_REV="${1:-main@origin}"
+
 # Create temporary file and ensure cleanup
 CHANGES_FILE=$(mktemp)
 trap "rm -f $CHANGES_FILE" EXIT
 
 # Get the repo root
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../../../../" && pwd)"
 
-SKILLS_DIR="$REPO_ROOT/skills"
+# Public skills live in agentfiles/shared/skills
+SKILLS_DIR="$REPO_ROOT/agentfiles/shared/skills"
 
 ##############################################################################
 # Helper Functions
@@ -55,9 +58,9 @@ if ! jj st --no-pager > /dev/null 2>&1; then
     exit 2
 fi
 
-# Get the list of changed files (comparing current @ to main)
-if ! jj diff --from main@origin --to @ --summary --no-pager > "$CHANGES_FILE" 2>&1; then
-    echo "Error: Failed to get changes from main bookmark" >&2
+# Get the list of changed files (comparing current @ to BASE_REV)
+if ! jj diff --from "$BASE_REV" --to @ --summary --no-pager > "$CHANGES_FILE" 2>&1; then
+    echo "Error: Failed to get changes from $BASE_REV" >&2
     exit 2
 fi
 
@@ -66,10 +69,10 @@ changed_skills=()
 skill_changes=()
 
 while IFS= read -r line; do
-    # Parse jj diff output format: "M    path/to/file"
-    # We need to extract skill names from paths like: skills/skill-name/...
+    # Parse jj diff output format: "M path/to/file"
+    # We need to extract skill names from paths like: agentfiles/shared/skills/skill-name/...
     # ⏺ This regex matches the jj diff output format and extracts the skill name. Let me break it down:
-    #   ^[[:space:]]*[A-Z][[:space:]]+skills/([^/]+)/
+    #   ^[[:space:]]*[A-Z][[:space:]]+agentfiles/shared/skills/([^/]+)/
     #   Part: ^
     #   Meaning: Start of line - anchors to the beginning
     #   ────────────────────────────────────────
@@ -83,8 +86,8 @@ while IFS= read -r line; do
     #   Part: [[:space:]]+
     #   Meaning: One or more whitespace characters - the gap between status and path
     #   ────────────────────────────────────────
-    #   Part: skills/
-    #   Meaning: Literal string - matches only skills/ directory, NOT .claude/skills/
+    #   Part: agentfiles/shared/skills/
+    #   Meaning: Literal string - matches only shared skills under agentfiles/, NOT .claude/skills/
     #   ────────────────────────────────────────
     #   Part: ([^/]+)
     #   Meaning: Capturing group - matches the skill name (anything that's NOT a /)
@@ -94,22 +97,22 @@ while IFS= read -r line; do
     #   Example
 
     #   For this jj diff line:
-    #   M    skills/detecting-jujutsu/SKILL.md
+    #   M agentfiles/shared/skills/detect-jujutsu/SKILL.md
 
     #   The regex matches:
     #   - M - the status
     #   -      (4 spaces) - the whitespace
-    #   - skills/ - the directory
-    #   - detecting-jujutsu - captured as the skill name
+    #   - agentfiles/shared/skills/ - the directory
+    #   - detect-jujutsu - captured as the skill name
     #   - / - the separator
 
     #   Why It Excludes .claude/skills/
 
     #   Lines like A .claude/skills/preparing-release/SKILL.md won't match because:
     #   - After the status letter A, the next thing is .claude/skills/...
-    #   - The pattern requires skills/ to come immediately after the status+whitespace
+    #   - The pattern requires agentfiles/shared/skills/ to come immediately after the status+whitespace
     #   - The .claude/ prefix breaks the match, so it never reaches the skills/ part
-    if [[ $line =~ ^[[:space:]]*[A-Z][[:space:]]+skills/([^/]+)/ ]]; then
+    if [[ $line =~ ^[[:space:]]*[A-Z][[:space:]]+agentfiles/shared/skills/([^/]+)/ ]]; then
         skill_name="${BASH_REMATCH[1]}"
         # Check if we haven't seen this skill yet
         if [[ ! " ${changed_skills[@]} " =~ " ${skill_name} " ]]; then
@@ -133,7 +136,7 @@ first=true
 for skill_name in "${changed_skills[@]}"; do
     skill_file="$SKILLS_DIR/$skill_name/SKILL.md"
     # Use relative path for jj commands
-    skill_file_rel="skills/$skill_name/SKILL.md"
+    skill_file_rel="agentfiles/shared/skills/$skill_name/SKILL.md"
 
     # Verify skill exists and has SKILL.md
     if [[ ! -f "$skill_file" ]]; then
@@ -145,7 +148,13 @@ for skill_name in "${changed_skills[@]}"; do
 
     # Get version from main bookmark using jj file show
     # This gets the actual file content at the main revision
-    main_version=$(jj file show -r main@origin "$skill_file_rel" 2>/dev/null | sed -n '/^---$/,/^---$/p' | grep "^version:" | head -1 | sed "s/^version: *//" | tr -d '"' || echo "")
+    main_version=$(jj file show -r "$BASE_REV" "$skill_file_rel" 2>/dev/null | sed -n '/^---$/,/^---$/p' | grep "^version:" | head -1 | sed "s/^version: *//" | tr -d '"' || echo "")
+
+    # Migration fallback: older revisions may still have skills under the legacy skills/ layout.
+    if [[ -z "$main_version" ]]; then
+        legacy_skill_file_rel="skills/$skill_name/SKILL.md"
+        main_version=$(jj file show -r "$BASE_REV" "$legacy_skill_file_rel" 2>/dev/null | sed -n '/^---$/,/^---$/p' | grep "^version:" | head -1 | sed "s/^version: *//" | tr -d '"' || echo "")
+    fi
 
     # Determine if version needs update
     needs_update="false"
@@ -157,15 +166,15 @@ for skill_name in "${changed_skills[@]}"; do
     changed_files="["
     file_count=0
     while IFS= read -r change_line; do
-        if [[ $change_line =~ ^[[:space:]]*[A-Z][[:space:]]+skills/${skill_name}/ ]]; then
+        if [[ $change_line =~ ^[[:space:]]*[A-Z][[:space:]]+agentfiles/shared/skills/${skill_name}/ ]]; then
             # Extract just the file path
-            file_path=$(echo "$change_line" | sed 's/^[A-Z]\s\+//' | xargs)
+            file_path=$(echo "$change_line" | sed -E 's/^[A-Z][[:space:]]+//' | xargs)
             if [[ -n "$file_path" ]]; then
                 if [[ $file_count -gt 0 ]]; then
                     changed_files="$changed_files,"
                 fi
                 changed_files="$changed_files\"$file_path\""
-                ((file_count++))
+                ((file_count+=1))
             fi
          fi
      done < "$CHANGES_FILE"

@@ -1,15 +1,18 @@
 ---
 name: write-agents-files
-description: Create and maintain effective AGENTS.md files following OpenAI best practices. Keep instructions brief, unlock agentic loops, document gotchas, and reference task-specific files. Use when setting up or improving agent instructions.
-version: "0.1.0"
+description: Use when setting up or improving agent instructions in AGENTS.md, CLAUDE.md or other coding agents instructions files.
+version: "0.1.1"
 ---
 
 # Writing Effective AGENTS.md Files
 
-Create and maintain high-quality AGENTS.md instruction files for AI coding agents following proven best practices from OpenAI and industry leaders.
+Create and maintain effective AGENTS.md files following best practices. 
+
+Keep instructions brief, unlock agentic loops, document gotchas, and reference task-specific files. 
 
 ## Table of Contents
 
+- [Core Principle: Map, Not Manual](#core-principle-map-not-manual)
 - [Common Sections in AGENTS.md](#common-sections-in-agentsmd)
 - [Instructions](#instructions)
   - [1. Understand Context](#1-understand-context)
@@ -22,6 +25,39 @@ Create and maintain high-quality AGENTS.md instruction files for AI coding agent
 - [Examples](#examples)
 - [Requirements](#requirements)
 - [See Also](#see-also)
+
+## Core Principle: Map, Not Manual
+
+Use **progressive disclosure**: the main AGENTS.md is a small, stable entry point that tells the agent where to look next.
+
+Treat the file as a **table of contents**, not an encyclopedia:
+
+- **Context is scarce**: long instruction blobs crowd out the task and the code.
+- **Too much guidance becomes non-guidance**: when everything is "important", the agent pattern-matches instead of navigating.
+- **Monoliths rot**: big manuals get stale quickly and humans stop maintaining them.
+- **Hard to verify**: blobs are difficult to lint for freshness, ownership, and cross-links.
+
+Practical rule of thumb:
+
+- Keep the main AGENTS.md around ~100 lines.
+- Put deeper sources of truth in dedicated files (often a structured `docs/` directory) and link to them from AGENTS.md.
+
+Example in-repo knowledge store layout (adapt as needed):
+
+```text
+AGENTS.md
+ARCHITECTURE.md
+docs/
+├── design-docs/
+│   └── index.md
+├── product-specs/
+│   └── index.md
+├── exec-plans/
+│   ├── active/
+│   └── completed/
+└── references/
+    └── topic-llms.txt
+```
 
 ## Common Sections in AGENTS.md
 
@@ -57,9 +93,10 @@ Before creating or updating an AGENTS.md file:
 - Use clear, imperative language (verb-first)
 - Focus on WHAT and WHY, not HOW (agents are smart enough)
 - Avoid over-explaining concepts the agent already knows
+- Prefer **progressive disclosure**: keep the top-level file scannable and link to deeper guidance.
 
 **Structure:**
-```markdown
+````markdown
 # Project Name
 
 Brief 1-2 sentence project description.
@@ -124,10 +161,10 @@ For specific workflows, see:
 - **Architecture**: [ARCHITECTURE.md](./ARCHITECTURE.md)
 - **API Design**: [API.md](./API.md)
 - **Testing**: [TESTING.md](./TESTING.md)
-```
+````
 
 **Example brief instruction:**
-```markdown
+````markdown
 ## Testing
 
 Run the full test suite before committing:
@@ -136,7 +173,7 @@ npm test
 ```
 
 Fix any failing tests immediately. Do not commit failing tests.
-```
+````
 
 ### 3. Add Agentic Loop Tools
 
@@ -151,7 +188,7 @@ Fix any failing tests immediately. Do not commit failing tests.
 - **Git hooks**: pre-commit, husky
 
 **Template:**
-```markdown
+````markdown
 ## Build
 
 Commands to build the project:
@@ -180,7 +217,7 @@ Tools and servers the agent can use:
   - List the MCP servers available in your environment
   - Include what each is for and when to use it
   - Example: Context7 for library API lookups, Exa for code context
-```
+````
 
 **Key principle:** Show the agent what success looks like by listing concrete verification commands.
 
@@ -225,6 +262,8 @@ Common mistakes to avoid (updated from real issues):
 
 **Point to task-specific .md files** instead of bloating the main AGENTS.md.
 
+For larger repos, prefer a dedicated knowledge base (often `docs/`) and link to it from the main AGENTS.md. Keep it navigable with an index and clear "where to look next" pointers.
+
 **Common specialized files:**
 - **PLANS.md**: Design and iteration guidelines before implementation
 - **ARCHITECTURE.md**: System design, component relationships
@@ -264,6 +303,7 @@ Consult these files before starting complex work.
 ✓ **Agentic loops**: Are verification tools listed with commands?
 ✓ **Gotchas**: Is there a living section for real mistakes?
 ✓ **References**: Are specialized topics in separate .md files?
+✓ **Map**: Does AGENTS.md act as a table of contents (progressive disclosure) instead of a dump?
 ✓ **Clarity**: Can a new agent understand instructions immediately?
 ✓ **Actionability**: Are all instructions concrete and executable?
 ✓ **Common sections**: Does it include project overview, build/test, tools (CLI+MCP), feature workflow?
@@ -302,6 +342,7 @@ Consult these files before starting complex work.
 - Update it in version control (PRs, reviewers, changelog)
 - Make it specific: "Added: 2025-01-15 (PR #123)"
 - Remove obsolete gotchas as root causes are fixed
+- When a human steps in to finish a task, ask: "What capability was missing, and how can we make it legible and enforceable for the agent?" Then update AGENTS.md, deeper docs, or verification commands.
 
 ### Split Complex Topics
 
@@ -323,7 +364,6 @@ See `examples/` directory for complete examples:
 - **examples/WEB-APP.md**: Full-featured web app with verification tools and MCP server example
 - **examples/LIBRARY.md**: Library with API guidelines and publishing workflow
 - **examples/GOTCHAS.md**: Rich Gotchas Codex from real project
-- **examples/THIS-REPO.md**: Self-referential AGENTS.md for agent-chisels repository
 
 ## Requirements
 

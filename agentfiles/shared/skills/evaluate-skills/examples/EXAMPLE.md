@@ -1,12 +1,12 @@
 # Skill Evaluation Example Report
 
-This document demonstrates a properly formatted skill evaluation report for the **evaluating-skills** skill (self-evaluation).
+This document demonstrates a properly formatted skill evaluation report for the **evaluate-skills** skill (self-evaluation).
 
 ---
 
 ## Executive Summary
 
-The **evaluating-skills** skill demonstrates strong professional quality and is production-ready. At 278 lines, it sits at 56% of the 500-line maximum, making it an appropriately-sized, high-complexity meta-skill. The skill exhibits excellent structure with a comprehensive 10-dimensional evaluation framework, strong prompt engineering practices, and thorough documentation. Notably, the skill has evolved to include robust error handling, edge case documentation, and comprehensive examples demonstrating the full quality spectrum.
+The **evaluate-skills** skill demonstrates strong professional quality and is production-ready. At 278 lines, it sits at 56% of the 500-line maximum, making it an appropriately-sized, high-complexity meta-skill. The skill exhibits excellent structure with a comprehensive 10-dimensional evaluation framework, strong prompt engineering practices, and thorough documentation. Notably, the skill has evolved to include robust error handling, edge case documentation, and comprehensive examples demonstrating the full quality spectrum.
 
 **Key Strengths:**
 - Comprehensive 10-dimensional evaluation framework with clear assessment criteria
@@ -88,12 +88,12 @@ Compared to official Anthropic skills repository patterns:
 
 | Skill | Lines | Complexity | Comparison |
 |-------|-------|-----------|-----------|
-| internal-comms | ~40 | Low | evaluating-skills is significantly more comprehensive |
-| canvas-design | ~310 | Moderate-High | evaluating-skills is similarly-sized with different focus |
-| skill-creator | ~550-600 | High (meta) | evaluating-skills is more compact and focused |
-| **evaluating-skills** | **278** | **High (meta)** | **Well-balanced for teaching evaluation methodology ✓** |
+| internal-comms | ~40 | Low | evaluate-skills is significantly more comprehensive |
+| canvas-design | ~310 | Moderate-High | evaluate-skills is similarly-sized with different focus |
+| skill-creator | ~550-600 | High (meta) | evaluate-skills is more compact and focused |
+| **evaluate-skills** | **278** | **High (meta)** | **Well-balanced for teaching evaluation methodology ✓** |
 
-**Assessment:** The evaluating-skills sits in an optimal position between comprehensive coverage and readability. Unlike skill-creator (which teaches creation), this skill focuses purely on evaluation methodology, making 278 lines appropriate. The structure mirrors professional code review practices with dimensional analysis similar to rubrics used in software engineering assessments.
+**Assessment:** The evaluate-skills sits in an optimal position between comprehensive coverage and readability. Unlike skill-creator (which teaches creation), this skill focuses purely on evaluation methodology, making 278 lines appropriate. The structure mirrors professional code review practices with dimensional analysis similar to rubrics used in software engineering assessments.
 
 ---
 
@@ -105,7 +105,7 @@ None. The skill is production-ready as-is.
 ### Medium Priority
 1. **Consider updating EXAMPLE-WITH-WARNINGS.md context** - Add a note that the example represents a historical snapshot of an earlier skill version (8 dimensions). *Rationale: Prevents confusion about current skill state while preserving historical record.*
 
-2. **Clarify comparative analysis guidance** - In section 4 (line 219), consider adding: "When comparing, use the evaluating-skills repository itself or other official Anthropic skills if available. If none are accessible, note this in the report." *Rationale: Provides fallback guidance for evaluators in different contexts.*
+2. **Clarify comparative analysis guidance** - In section 4 (line 219), consider adding: "When comparing, use the evaluate-skills repository itself or other official Anthropic skills if available. If none are accessible, note this in the report." *Rationale: Provides fallback guidance for evaluators in different contexts.*
 
 ### Low Priority
 1. **Create EXAMPLE-NEEDS-REFACTOR.md** - Add a third example showing a skill with critical issues requiring major refactoring. *Rationale: Completes the assessment spectrum (Pass → Warnings → Fail) for comprehensive calibration.*
@@ -114,7 +114,7 @@ None. The skill is production-ready as-is.
 
 ## Overall Assessment
 
-**Verdict:** The evaluating-skills skill is production-ready and demonstrates professional quality.
+**Verdict:** The evaluate-skills skill is production-ready and demonstrates professional quality.
 
 **Recommendation:** **Keep as-is** - The skill exhibits excellent structure, comprehensive coverage across 10 evaluation dimensions, appropriate examples, and robust error handling. The skill successfully demonstrates self-awareness by evaluating itself using its own methodology, proving the framework's self-consistency.
 
@@ -123,5 +123,5 @@ The 10-dimensional framework is comprehensive and well-designed. The structure i
 ---
 
 **Evaluation Date:** 2026-01-08  
-**Skill Path Evaluated:** `/Users/hans/dev/agent-chisels/plugins/agent-tools/skills/evaluating-skills/SKILL.md`  
+**Skill Path Evaluated:** `/Users/hans/dev/agent-chisels/agentfiles/shared/skills/evaluate-skills/SKILL.md`  
 **Assessment Standard:** Claude Code official guidelines and professional technical writing standards

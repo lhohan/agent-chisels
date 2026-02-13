@@ -25,7 +25,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-SKILLS_DIR="$REPO_ROOT/skills"
+SKILLS_DIR="$REPO_ROOT/agentfiles/shared/skills"
 
 ##############################################################################
 # Discover all skills in the skills directory
@@ -50,14 +50,14 @@ TEST_NUM=0
 ##############################################################################
 
 tap_ok() {
-    ((TEST_NUM++))
-    ((PASS++))
+    ((TEST_NUM+=1))
+    ((PASS+=1))
     echo "ok $TEST_NUM - $1"
 }
 
 tap_not_ok() {
-    ((TEST_NUM++))
-    ((FAIL++))
+    ((TEST_NUM+=1))
+    ((FAIL+=1))
     echo "not ok $TEST_NUM - $1"
     if [[ -n "$2" ]]; then
         echo "# $2"

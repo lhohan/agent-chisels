@@ -36,7 +36,7 @@ fi
 # 3. Authoritative check: jj status at root
 if (cd "$REPO_ROOT" && jj st --no-pager --color=never >/dev/null 2>&1); then
   log "Jujutsu detected: 'jj status' succeeded at repo root ($REPO_ROOT)."
-  log "Next steps: Use 'jj' commands for version control; consult 'using-jujutsu' skill for guidance."
+  log "Next steps: Use 'jj' commands for version control; consult 'use-jujutsu' skill for guidance."
   exit 0
 else
   # Check if it was just "not a jj repo" or some other error

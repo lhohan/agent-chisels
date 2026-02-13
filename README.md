@@ -11,17 +11,15 @@ Reusable skills, commands, and agents for AI-assisted development.
 ## Available Skills
 
 ### Architecture
-- [document-architectural-decisions](./skills/document-architectural-decisions/SKILL.md) — Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
-
-### Testing
-- [design-test-dsl](./skills/design-test-dsl/SKILL.md) — **(Experimental/Unstable)** Design fluent, behaviour-driven test DSLs (Given/When/Then) for acceptance and unit tests against stable interfaces, with Rust-oriented examples.
+- [document-architectural-decisions](./agentfiles/shared/skills/document-architectural-decisions/SKILL.md) — Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
 
 ### Version Control
-- [detect-jujutsu](./skills/detect-jujutsu/SKILL.md) — Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
-- [use-jujutsu](./skills/use-jujutsu/SKILL.md) — Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and working with revisions/revsets.
+- [detect-jujutsu](./agentfiles/shared/skills/detect-jujutsu/SKILL.md) — Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.
+- [use-jujutsu](./agentfiles/shared/skills/use-jujutsu/SKILL.md) — Detailed guidance on Jujutsu (jj) VCS operations including committing, pushing, searching history, and working with revisions/revsets.
 
 ### Agentic Quality Assurance
-- [evaluate-skills](./skills/evaluate-skills/SKILL.md) — Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
+- [evaluate-skills](./agentfiles/shared/skills/evaluate-skills/SKILL.md) — Evaluate Claude Code skills against best practices for size, structure, examples, and prompt engineering. Use when reviewing skills for deployment, optimization, or standards compliance.
+- [write-agents-files](./agentfiles/shared/skills/write-agents-files/SKILL.md) — Create and maintain effective AGENTS.md files. Use when setting up or improving agent instructions.
 
 
 ## Installation
@@ -36,13 +34,13 @@ Reusable skills, commands, and agents for AI-assisted development.
 
 ```
 /plugin install jj@agent-chisels
-/plugin install documenting-architecture-decisions@agent-chisels
+/plugin install document-architectural-decisions@agent-chisels
 /plugin install agent-tools@agent-chisels
 ```
 
 ### Manually
 
-To install only the skills, add the contents of the `skills` directory to your `~/.claude/skills` (user level) or `.claude/skills` (project level). This will install skills for all CLI AI-agents supporting skills in `.claude`.
+To install only the skills, add the contents of `agentfiles/shared/skills/` to your `~/.claude/skills` (user level) or `.claude/skills` (project level). This will install skills for all CLI AI-agents supporting skills in `.claude`.
 
 Alternatively, copy the skills to your CLI AI-agent's preferred location for skills.
 
