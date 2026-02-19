@@ -1,34 +1,121 @@
 ---
 name: detect-jujutsu
 description: Verify if the current repository uses Jujutsu (jj) instead of git. Use this skill when you or the user needs to confirm the version control system (VCS) state before performing operations.
-version: 0.2.2
+version: 0.4.0
 ---
 
 # Detecting Jujutsu (jj)
 
-This repository uses **Jujutsu (jj)** as its version control if confirmed by the authoritative detection script built for this project.
+This skill determines whether the current repository uses Jujutsu (jj). Use the detection ladder in order.
 
-## Detection Procedure
+## Detection Ladder
 
-To verify if this is a Jujutsu repository, you **MUST** run the following script using the Bash tool:
+**Stop at the first successful detection.**
+
+### Step 1: Try `jj st` (fast path)
 
 ```bash
-# If you're in the agent-chisels repo:
-bash scripts/detect-jj.sh
+jj st --no-pager
 ```
 
-This works from the repository root directory.
+- **Exit 0** → JJ repo. Use `jj` commands. Invoke `use-jujutsu` skill. **STOP HERE.**
+- **Blocked by tool policy** → Proceed to Step 3 (do not attempt Step 2).
+- **Exit non-zero** → Proceed to Step 2.
 
-### Interpreting the Result
+### Step 2: Run detection script (authoritative)
 
-- **Exit Code 0 (Success)**: This is a Jujutsu repository.
-  - **Action**: Use `jj` commands exclusively.
-  - **Next Step**: **Invoke the `use-jujutsu` skill** for detailed command reference and workflows.
-- **Exit Code 1 (Not JJ)**: This is a standard Git repository.
-  - **Action**: Use standard `git` workflows.
-- **Exit Code 2 (Indeterminate)**: An error occurred (e.g., `jj` not installed or not in a git repo).
-  - **Action**: Follow the "Next steps" printed by the script.
+The script is embedded inline to work across multiple coding agents regardless of where skills are installed.
+
+```bash
+cat > /tmp/detect-jj.sh << 'SCRIPT_EOF'
+#!/bin/bash
+
+# Embedded inline for cross-agent compatibility.
+# Shared Jujutsu (jj) detection script
+# Authoritative check for JJ repository status, root-aware.
+
+QUIET=false
+if [ "$1" == "--quiet" ]; then
+  QUIET=true
+fi
+
+log() {
+  if [ "$QUIET" = false ]; then
+    echo "$1"
+  fi
+}
+
+# 1. Determine repository root
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -z "$REPO_ROOT" ]; then
+  log "Error: Not inside a git repository (git rev-parse failed)."
+  log "Next steps: cd into a repository or run 'git status' to confirm environment."
+  exit 2
+fi
+
+# 2. Check for jj command
+if ! command -v jj >/dev/null 2>&1; then
+  if [ -d "$REPO_ROOT/.jj" ]; then
+    log "Hint: .jj directory found at repo root ($REPO_ROOT), but 'jj' command is missing."
+    log "Next steps: Install Jujutsu (https://martinvonz.github.io/jj/) to work with this repository."
+  else
+    log "No Jujutsu detected: 'jj' command missing and no .jj directory at root."
+  fi
+  exit 2
+fi
+
+# 3. Authoritative check: jj status at root
+if (cd "$REPO_ROOT" && jj st --no-pager --color=never >/dev/null 2>&1); then
+  log "Jujutsu detected: 'jj status' succeeded at repo root ($REPO_ROOT)."
+  log "Next steps: Use 'jj' commands for version control; consult 'use-jujutsu' skill for guidance."
+  exit 0
+else
+  # Check if it was just "not a jj repo" or some other error
+  if [ -d "$REPO_ROOT/.jj" ]; then
+     log "Warning: .jj directory exists at root, but 'jj status' failed."
+     log "Next steps: Check 'jj status' manually for specific errors (e.g. corruption or version mismatch)."
+     exit 2
+  else
+     log "No Jujutsu detected: 'jj status' failed and no .jj directory found at root."
+     log "Next steps: Use git workflows for this repository."
+     exit 1
+  fi
+fi
+SCRIPT_EOF
+
+bash /tmp/detect-jj.sh
+```
+
+- **Exit 0** → JJ repo. Use `jj` commands. Invoke `use-jujutsu` skill. **STOP HERE.**
+- **Exit 1** → Git repo (not JJ). Use standard `git` workflows. **STOP HERE.**
+- **Exit 2** → Indeterminate. Proceed to Step 3.
+- **Blocked by tool policy** → Proceed to Step 3.
+
+### Step 3: Check for `.jj/` directory (fallback - no Bash required)
+
+**Use this when Bash commands are restricted or previous steps failed.**
+
+Use the Read or Glob tool (not Bash) to check for `.jj/` directory:
+
+Determine repo root using Read on current directory or known paths:
+   ```
+   Read: <repo-root>/.jj
+   ```
+
+- **`.jj/` found** → JJ repo. Use `jj` commands. Invoke `use-jujutsu` skill. **STOP HERE.**
+- **Not found** → Assume Git. Use standard `git` workflows. **STOP HERE.**
+- **Cannot determine** → Ask user: "Cannot detect version control system. Is this a Jujutsu (jj) or Git repository?"
+
+## Handling Tool Restrictions
+
+**If you receive a tool policy error when running Bash:**
+
+1. Immediately switch to Step 3 (do not retry Bash commands).
+2. Use Read/Glob tools only - these typically have fewer restrictions.
+3. If still blocked, ask the user directly.
 
 ## Outcome
 
-Always respect the detection result. If Jujutsu is confirmed, do not use `git` commands unless explicitly requested by the user for remote synchronization tasks.
+- **JJ confirmed:** Use `jj` commands. Invoke `use-jujutsu` skill.
+- **Git:** Use standard `git` workflows.
+- **Uncertain:** State uncertainty and ask user which VCS to use.
