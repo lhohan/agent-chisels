@@ -1,7 +1,7 @@
 ---
 name: use-jujutsu
 description: This skill should be used for detailed guidance on Jujutsu (jj) VCS operations, including committing, pushing, searching history, and working with revisions/revsets. Use it when the user asks "how do I use jj?", "translate git to jj", ask to interact with VCS using jj or for specific jj command syntax.
-version: 0.3.0
+version: 0.3.1
 ---
 
 # Using Jujutsu (jj) VCS
@@ -21,6 +21,14 @@ This guide provides the definitive instruction set for working with **Jujutsu (j
 - Push main: `jj bookmark set main -r @- && jj git push`
 - Undo last jj command: `jj undo`
 - Help: `jj help` -- use this is you need to research how `jj` works. Or use available MCPs.
+
+## Before Any Commit
+
+Run this safety checklist before `jj commit`:
+- Run `jj st --no-pager`.
+- Commit with `jj commit -m "message"` (or fileset form when committing only related paths).
+
+If location is ambiguous (for example, multiple checkouts/workspaces), confirm with `jj root`.
 
 ## Search and History Operations
 
