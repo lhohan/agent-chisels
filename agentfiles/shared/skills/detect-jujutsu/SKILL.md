@@ -1,12 +1,16 @@
 ---
 name: detect-jujutsu
-description: Verify if the current repository uses Jujutsu (jj) instead of git. Use this skill when you or the user needs to confirm the version control system (VCS) state before performing operations.
-version: 0.4.0
+description: Use at session start or before the first version control action to detect whether the repository should be operated with Git or Jujutsu (jj).
+version: 0.5.0
 ---
 
 # Detecting Jujutsu (jj)
 
 This skill determines whether the current repository uses Jujutsu (jj). Use the detection ladder in order.
+
+Trigger cues: user asks to run version control actions (for example status, diff, log, commit, amend, push, branch, rebase) where both `git` and `jj` may be available.
+
+If `jj` is available in the current repo, prefer `jj` as the default VCS for this session unless the user or project policy explicitly asks for `git`.
 
 ## Detection Ladder
 
