@@ -105,6 +105,21 @@ If a friendlier display name helps, keep it close to the code, for example:
 - Add styles after the model is stable.
 - Keep generated output out of source directories. Export into an ignored directory such as `target/c4` or `build/c4`.
 
+## Diagram Review Checklist
+
+When using Structurizr, focus review on what the tool won't enforce: clarity, meaning, and labeling.
+
+- Title: says scope in human terms.
+- Legend/notation: any non-default tags/styles/colors/shapes/icons/lines have explicit meaning and are consistent.
+- Elements: every element has a short "what it does" description.
+- Elements: technology specified where it matters (especially containers, datastores, external-facing components).
+- Elements: acronyms/abbreviations expanded or unambiguous for the intended audience.
+- Relationships: every line has a specific intent label (avoid generic "Uses").
+- Relationships: labels match direction (source -> destination reads correctly).
+- Relationships: technology/protocol specified where it matters (e.g. HTTP, gRPC, AMQP, JDBC).
+
+Reference: https://c4model.com/diagrams/checklist
+
 ## Common Mistakes
 
 - Inventing a container to represent shared code
