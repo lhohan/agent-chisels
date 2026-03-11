@@ -1,5 +1,5 @@
 ---
-name: modeling-c4-diagrams
+name: modelling-c4-diagrams
 description: Use when creating, revising, or reviewing C4 architecture diagrams from a real codebase, especially when deciding system, container, and component boundaries or writing Structurizr DSL.
 ---
 

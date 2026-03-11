@@ -12,7 +12,7 @@ Reusable skills, commands, and agents for AI-assisted development.
 
 ### Architecture
 - [document-architectural-decisions](./agentfiles/shared/skills/document-architectural-decisions/SKILL.md) — Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
-- [modeling-c4-diagrams](./agentfiles/shared/skills/modeling-c4-diagrams/SKILL.md) — Use when creating, revising, or reviewing C4 architecture diagrams from a real codebase, especially when deciding system, container, and component boundaries or writing Structurizr DSL.
+- [modelling-c4-diagrams](./agentfiles/shared/skills/modelling-c4-diagrams/SKILL.md) — Use when creating, revising, or reviewing C4 architecture diagrams from a real codebase, especially when deciding system, container, and component boundaries or writing Structurizr DSL.
 
 ### Version Control
 - [detect-jujutsu](./agentfiles/shared/skills/detect-jujutsu/SKILL.md) — Verify if the current repository uses Jujutsu (jj) instead of git. Use when confirming VCS state before operations.

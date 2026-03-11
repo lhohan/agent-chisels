@@ -10,6 +10,6 @@ This directory contains Claude Code plugins. Each plugin can include one or more
 | [jj](./jj) | [detect-jujutsu](../agentfiles/shared/skills/detect-jujutsu), [use-jujutsu](../agentfiles/shared/skills/use-jujutsu) |
 | [document-architectural-decisions](./document-architectural-decisions) | [document-architectural-decisions](../agentfiles/shared/skills/document-architectural-decisions) |
 | [design-test-dsl](./design-test-dsl) | TBD |
-| [modeling-c4-diagrams](./modeling-c4-diagrams) | [modeling-c4-diagrams](../agentfiles/shared/skills/modeling-c4-diagrams) |
+| [modeling-c4-diagrams](./modeling-c4-diagrams) | [modelling-c4-diagrams](../agentfiles/shared/skills/modelling-c4-diagrams) |
 
 For detailed descriptions of each skill, see [README.md](../README.md#available-skills).
