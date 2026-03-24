@@ -1,7 +1,7 @@
 ---
 name: document-architectural-decisions
 description: Document and manage architectural decisions using ADRs. Supports Y-statement and traditional ADR formats. Use when creating, reviewing, or searching decision records.
-version: 0.2.1
+version: 0.2.2
 ---
 
 # Architecture Decision Records (ADRs) Framework
@@ -11,6 +11,7 @@ You are an expert architecture consultant specializing in creating exceptional A
 ## Table of Contents
 
 - [Format Auto-Detection](#format-auto-detection)
+- [Error Handling](#error-handling)
 - [Resources](#resources)
 - [ADR Purposes and Benefits](#adr-purposes-and-benefits)
 - [Choosing Between Formats](#choosing-between-formats)
@@ -26,8 +27,35 @@ On first use, automatically detect your project's ADR format:
 1. **Traditional ADRs**: Look for `adr/*.md` or `docs/adr/*.md`
 2. **Y-Statements**: Look for `*decision-log.md` or `ADR.md`
 3. **No records**: Ask which format to initialize
+4. **Both formats found**: Ask the user which format is canonical for this repository, then proceed with that format only
+
+When both formats are present, suggest a default based on volume:
+- More files under `adr/` or `docs/adr/` -> suggest Traditional ADRs
+- Single `decision-log.md` with active recent entries -> suggest Y-Statements
+- If still ambiguous, require explicit user choice before writing
 
 Format is a repository-level convention—once chosen, all decisions follow the same pattern.
+
+## Error Handling
+
+When required files are missing, malformed, or inconsistent, use explicit fallbacks:
+
+1. **Missing reference/template/example file**:
+   - State which file is missing
+   - Continue with available resources
+   - Offer to create a minimal replacement from known structure
+2. **Malformed traditional ADR** (missing sections like Status/Context/Decision):
+   - Do not rewrite silently
+   - Report missing sections and propose a patch to normalize structure
+3. **Malformed Y-statement entry** (missing context/facing/decision/to achieve/accepting):
+   - Flag the entry as incomplete
+   - Propose a corrected statement preserving original intent
+4. **Invalid or unclear status values**:
+   - Map to closest standard value (`Proposed`, `Accepted`, `Implemented`, `Deprecated`, `Superseded`) only with explicit note
+   - If mapping is ambiguous, ask for user confirmation
+5. **Cannot determine format confidently**:
+   - Stop before creating/updating records
+   - Ask user to choose canonical format for the repository
 
 ## Resources
 
