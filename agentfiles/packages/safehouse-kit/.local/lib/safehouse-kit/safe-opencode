@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir() {
+    cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P
+}
+
+# Permissions:
+# - allow all tools, `external_directory`: seems to be necessary in addition to not have 'Ask' when going outside working dir
+# - git: deny: personal tooling preference:  because I use use jj)
+# - doom_loop: ask: LLM specific which cannot be controlled by sandbox
+export OPENCODE_PERMISSION='{"*":"allow", "doom_loop": "ask", "external_directory": "allow" ,"git *": "deny"}'
+
+exec "$(script_dir)/sandbox-agent.sh" opencode "$@"

@@ -1,0 +1,31 @@
+;; Local shared grants for all agent-mode launches via sandbox-agent.sh.
+;; Keep entries explicit and minimal.
+
+;; Shared agent config
+(allow file-read*
+    (home-subpath "/dotfiles/agentsfiles/shared")
+    (home-subpath "/dev/agent-chisels/agentfiles/shared")
+)
+
+;; Shared source roots for all coding agents
+(allow file-read*
+    (home-subpath "/dev")
+    (home-subpath "/dotfiles")
+)
+
+;; Opencode dotfiles config
+(allow file-read*
+    (home-subpath "/dotfiles/packages/opencode")
+)
+
+;; Dolt global state.
+(allow file-read* file-write*
+    (home-subpath "/.dolt")
+)
+
+;; Defense-in-depth: block Dolt credential material by default.
+;; Allowing ~/.dolt keeps local state usable, but agents should not inherit
+;; credential-backed remote access unless explicitly enabled later.
+(deny file-read* file-write*
+    (home-subpath "/.dolt/creds")
+)

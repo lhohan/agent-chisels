@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_dir() {
+    cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P
+}
+
+main() {
+    local sandbox_agent_sh
+    sandbox_agent_sh="$(script_dir)/sandbox-agent.sh"
+
+    if [[ $# -eq 0 ]]; then
+        printf 'Usage: safe <cmd...>\n' >&2
+        printf '       safe -- <cmd...>\n' >&2
+        exit 1
+    fi
+
+    # Normalize: if first arg is "--", pass through; otherwise prepend "--"
+    if [[ "$1" == "--" ]]; then
+        exec "$sandbox_agent_sh" "$@"
+    else
+        exec "$sandbox_agent_sh" -- "$@"
+    fi
+}
+
+main "$@"
