@@ -97,13 +97,13 @@ while IFS= read -r line; do
     #   Example
 
     #   For this jj diff line:
-    #   M agentfiles/shared/skills/detect-jujutsu/SKILL.md
+    #   M agentfiles/shared/skills/evaluate-skills/SKILL.md
 
     #   The regex matches:
     #   - M - the status
     #   -      (4 spaces) - the whitespace
     #   - agentfiles/shared/skills/ - the directory
-    #   - detect-jujutsu - captured as the skill name
+    #   - evaluate-skills - captured as the skill name
     #   - / - the separator
 
     #   Why It Excludes .claude/skills/

@@ -152,18 +152,18 @@ Ready to commit and release!
 {
   "changed_skills": [
     {
-      "name": "detect-jujutsu",
+      "name": "evaluate-skills",
       "current_version": "0.2.0",
       "main_version": "0.1.0",
       "needs_update": false,
-      "changed_files": ["agentfiles/shared/skills/detect-jujutsu/SKILL.md"]
+      "changed_files": ["agentfiles/shared/skills/evaluate-skills/SKILL.md"]
     },
     {
-      "name": "use-jujutsu",
+      "name": "write-agents-files",
       "current_version": "0.2.0",
       "main_version": "0.2.0",
       "needs_update": true,
-      "changed_files": ["agentfiles/shared/skills/use-jujutsu/SKILL.md", "agentfiles/shared/skills/use-jujutsu/scripts/detect.sh"]
+      "changed_files": ["agentfiles/shared/skills/write-agents-files/SKILL.md", "agentfiles/shared/skills/write-agents-files/scripts/validate.sh"]
     }
   ]
 }

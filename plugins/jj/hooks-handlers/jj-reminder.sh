@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # Jujutsu (jj) SessionStart hook handler.
-# Uses shared detection script to gate context injection.
+# Performs inline detection; skills are maintained externally in agentfiles.
 
 # 1. Authoritative detection (root-aware)
-if ! bash "${CLAUDE_PLUGIN_ROOT}/skills/detecting-jujutsu/scripts/detect-jj.sh" --quiet; then
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+if ! command -v jj >/dev/null 2>&1; then
+  exit 0
+fi
+if ! (cd "$REPO_ROOT" && jj st --no-pager --color=never >/dev/null 2>&1); then
   exit 0
 fi
 
@@ -14,8 +18,8 @@ CONTEXT="**CRITICAL: Jujutsu (jj) repository detected.**
 Always use \`jj\` commands for version control operations in this repository.
 
 **Guidance**:
-- If you are uncertain about the VCS state (e.g. cwd changed), invoke the \`detecting-jujutsu\` skill.
-- For detailed instructions and best practices, invoke the \`using-jujutsu\` skill.
+- If you are uncertain about the VCS state (e.g. cwd changed), invoke the \`detect-jujutsu\` skill.
+- For detailed instructions and best practices, invoke the \`use-jujutsu\` skill.
 - Use \`/use-jj\` to re-inject this reminder.
 
 State the version control system you will be using for this session."

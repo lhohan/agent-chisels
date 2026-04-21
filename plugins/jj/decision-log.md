@@ -1,5 +1,13 @@
 # Decision Log
 
+### JJ-007: Migrate split skills to agentfiles repository [Implemented]
+
+> **In the context of** centralizing skill maintenance and eliminating duplication,
+> **facing** two copies of `detect-jujutsu` and `use-jujutsu` across agent-chisels and agentfiles,
+> **we decided** to remove the skill copies from this plugin and maintain them exclusively in the [agentfiles](https://github.com/lhohan/agentfiles) repository,
+> **to achieve** a single source of truth,
+> **accepting** that users must now install those skills separately from agentfiles.
+
 ### JJ-006: Keep Simple SessionStart Hook [Implemented]
 
 > **In the context of** improving jj reminder effectiveness in long sessions,

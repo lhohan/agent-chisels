@@ -6,7 +6,7 @@ description: Inject Jujutsu VCS context and instructions
 
 Always use `jj` commands for version control operations in this repository. 
 
-For detailed guidance and confirmation, you must refer to the following skills:
+For detailed guidance and confirmation, refer to the following skills (installed from [agentfiles](https://github.com/lhohan/agentfiles)):
 - **detect-jujutsu**: To verify repository state using the authoritative detection script.
 - **use-jujutsu**: For full command reference, revsets, and history searching.
 

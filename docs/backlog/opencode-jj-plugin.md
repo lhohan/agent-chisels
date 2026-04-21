@@ -67,8 +67,7 @@ This separation:
 
 **Files:**
 - `plugins/jj/hooks/hooks.json` - Hook configuration
-- `plugins/jj/hooks-handlers/jj-reminder.sh` - Handler script
-- `skills/detect-jujutsu/scripts/detect-jj.sh` - Detection logic
+- `plugins/jj/hooks-handlers/jj-reminder.sh` - Handler script (performs inline detection; skills are maintained externally in [agentfiles](https://github.com/lhohan/agentfiles))
 
 **Flow:**
 1. SessionStart triggers `jj-reminder.sh`
@@ -107,7 +106,8 @@ export const JJVCSPlugin: Plugin = async (ctx) => {
   // Get path to shared detection script in skills/
   const __dirname = dirname(fileURLToPath(import.meta.url))
   const repoRoot = resolve(__dirname, "../../..")
-  const detectScript = resolve(repoRoot, "skills/detect-jujutsu/scripts/detect-jj.sh")
+  // Detection script is now maintained in agentfiles; embed or copy locally if needed
+  const detectScript = resolve(repoRoot, "plugins/jj/hooks-handlers/jj-reminder.sh")
 
   // Detection function (reuses existing shell script)
   async function detectJJ(): Promise<boolean> {
@@ -205,7 +205,7 @@ opencode-plugins/
 SCRIPT_DIR="$(dirname "$0")"
 OUTPUT_FILE="${SCRIPT_DIR}/../../.opencode-jj-context.md"
 
-if bash "${SCRIPT_DIR}/../../../skills/detect-jujutsu/scripts/detect-jj.sh" --quiet; then
+if bash "${SCRIPT_DIR}/../../../plugins/jj/hooks-handlers/jj-reminder.sh" --quiet; then
   cat > "$OUTPUT_FILE" << 'EOF'
 # Jujutsu VCS Context
 

@@ -6,9 +6,8 @@ This plugin ensures Claude Code uses Jujutsu (`jj`) commands instead of git when
 
 - **SessionStart Hook**: Lightweight reminder that the repository uses `jj`, pointing to the split skills and manual command.
 - **Shared Detection Script**: `scripts/detect-jj.sh` provides a check for detecting Jujutsu repositories.
-- **Split Skills**: 
-  - `detect-jujutsu`: For verifying if a repository uses JJ by running the shared detection script.
-  - `use-jujutsu`: Comprehensive guide based on `jj-vcs.md`.
+- **Split Skills** (migrated):
+  - `detect-jujutsu` and `use-jujutsu` were previously bundled here; they are now maintained in the [agentfiles](https://github.com/lhohan/agentfiles) repository under `agents/dotagents/.agents/skills/`.
 - **Manual Command**: `/use-jj` command for manual reinforcement and brain resets.
 
 ## Usage
@@ -22,6 +21,8 @@ The plugin detects a Jujutsu repository at session start and injects a concise b
 Claude is instructed to use the skills as a "pre-flight check" for VCS operations. You can also explicitly trigger them:
 - Ask "Are we using jj?" or "What VCS is this?" to trigger `detect-jujutsu`.
 - Ask "How do I commit with jj?" or "Show me jj revsets" to trigger `use-jujutsu`.
+
+> **Note:** These skills are no longer bundled in this repository. Install them from [agentfiles](https://github.com/lhohan/agentfiles) if you need them locally.
 
 ### Manual Activation
 Use `/use-jj` to reset the model's VCS context at any time.

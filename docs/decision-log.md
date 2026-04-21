@@ -2,6 +2,14 @@
 
 Decisions are listed in reverse chronological order (most recent first).
 
+### AC-005: Migrate JJ skills to agentfiles repository [Status: Implemented]
+
+> **In the context of** maintaining reusable skills across multiple repositories,
+> **facing** duplication between the agent-chisels and agentfiles repositories,
+> **we decided** to move the canonical `detect-jujutsu` and `use-jujutsu` skills to the agentfiles repository (`agents/dotagents/.agents/skills/`),
+> **to achieve** a single source of truth and simplify maintenance,
+> **accepting** that the agent-chisels repository no longer bundles these skills and must reference them externally.
+
 ### AC-004: Introduce agentfiles/ for centralized multi-agent configuration management [Status: Proposed]
 
 > **In the context of** managing configurations for multiple CLI agents (Claude Code, OpenCode, Mistral Vibe) in a single repository,
