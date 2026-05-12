@@ -51,29 +51,70 @@ to achieve a lean baseline, long-term stability, first-class support, and straig
 
 ## Format Specification
 
-Y-Statements are organized with a heading for each decision, followed by the statement in a blockquote:
+Each decision record uses a heading followed by labeled Y-statement fields. The core five parts are mandatory; additional fields are optional and appear in a fixed order.
 
-**Format**:
+### Required fields
+
 ```markdown
-### PREFIX-NNN: [Brief description] [Status: Proposed/Accepted/Deprecated/Implemented/Superseded]
+### PREFIX-NNN: [Brief description] [Accepted|Superseded by ...|Deprecated]
 
-> **In the context of** [context],
-> **facing** [requirement/constraint],
-> **we decided** [choice],
-> **to achieve** [benefits],
-> **accepting** [trade-offs].
+**In the context of** [context]
+
+**Facing** [constraint, pressure, or problem]
+
+> **We decided** [chosen option]
+
+**To achieve** [intended benefit or outcome]
+
+**Accepting** [trade-off, cost, limitation, or risk]
 ```
 
-**Example**:
-```markdown
-### WEB-003: GoAccess for self-hosted analytics [Yes]
+`**Accepting**` may use a bullet list when a single sentence becomes hard to scan:
 
-> **In the context of** using Caddy on a Hetzner VPS,
-> **facing** the need for simple, reproducible, self-hosted analytics without client-side tracking,
-> **we decided** to use GoAccess,
-> **to achieve** real-time, log-based analytics with minimal setup and on-premises data,
-> **accepting** less detailed user behavior insights.
+```markdown
+**Accepting**
+- first trade-off
+- second trade-off
+- third trade-off
 ```
+
+### Optional fields (in order)
+
+```markdown
+**Rationale** [why this option was chosen over alternatives]
+
+**Scope limit** [explicit boundary of what this decision does not cover]
+
+**Supersedes** [older decision IDs]
+
+**Amendment (YYYY-MM-DD)** [later clarification or correction]
+```
+
+Multiple amendments should be listed in chronological order.
+
+### Example
+
+```markdown
+### WEB-003: GoAccess for self-hosted analytics [Accepted]
+
+**In the context of** using Caddy on a Hetzner VPS
+
+**Facing** the need for simple, reproducible, self-hosted analytics without client-side tracking
+
+> **We decided** to use GoAccess
+
+**To achieve** real-time, log-based analytics with minimal setup and on-premises data
+
+**Accepting** less detailed user behavior insights
+```
+
+### Formatting rules
+
+- One decision per heading. Historical compound records (e.g. two Y-statements under one ID) are a migration exception, not a pattern for new entries.
+- Record only durable, structural choices selected among plausible alternatives. Do not record cleanup history, migration steps, version inventory, or mechanical implementation detail unless they explain a current constraint.
+- Keep optional fields outside the decision blockquote.
+- Preserve reverse chronological ordering within each file.
+- Prefer direct, concrete wording over abstract prose.
 
 ## ID Prefix Conventions
 
@@ -116,25 +157,26 @@ When helping users add decisions to a Y-statement log:
 If no decision records exist, help user:
 1. Choose an ID prefix representing their domain (e.g., WEB, API, INFRA, ARCH)
 2. Create `decision-log.md` in project root or docs/ directory
-3. Use the Y-statement template from assets with customized prefix
+3. Use the Y-statement template from assets with customized prefix and adjust to the labeled-field format
 4. Add the first decision using the workflow above
 
 ## Reviewing Y-Statement Decisions
 
 When reviewing Y-statements, check:
-- Are all six components present? (context, facing, decision, to achieve, accepting)
-- Is the decision bolded for visibility?
+- Are all five mandatory fields present? (In the context of, Facing, We decided, To achieve, Accepting)
+- Is the decision line a blockquote for emphasis?
 - Are ID numbers consistent with the prefix pattern (no gaps, proper increments)?
 - Is the statement understandable? (Suggest splitting long ones into 2-3 sentences if needed)
 - Are trade-offs explicit and clear?
-- Does the row maintain table formatting?
+- If optional fields are present (Rationale, Scope limit, Supersedes, Amendment), are they in the correct order?
+- Does the record describe a durable, structural choice rather than task history or migration noise?
 
 ## Tips for Writing Effective Y-Statements
 
 ### Completeness
-✓ Include all six parts (context, facing, decision, to achieve, accepting, alternatives optional)
-✓ Ensure the decision stands out (bold it)
-✓ Make trade-offs explicit in the "accepting that" section
+✓ Include all five mandatory parts (context, facing, decision, to achieve, accepting)
+✓ Ensure the decision stands out (blockquote)
+✓ Make trade-offs explicit in the "Accepting" section
 
 ### Clarity
 ✓ Some readers don't appreciate very long sentences—consider splitting into 2-3 sentences if needed
@@ -173,7 +215,8 @@ A well-written Y-statement:
 - ✓ Explains the context that prompted the decision
 - ✓ Identifies trade-offs explicitly
 - ✓ Is specific enough to be useful months or years later
-- ✓ Has all six parts (or clearly omits optional alternatives)
+- ✓ Has all five mandatory fields in the correct order
+- ✓ Uses the blockquote format for the decision line
 - ✓ Uses consistent language and formatting within the log
 
 ## External Resources
